@@ -1,0 +1,51 @@
+:root {   
+    /*******
+    Generals
+    ********/ 
+
+    /* colors */
+    --accent-red: #FF4037;
+    --accent-light-red: #FCEEF0;
+    --accent-lighter-red: #F5E1E3;
+
+    --accent-blue: #1D3B8A;
+    --accent-light-blue: #E2E9F6;
+    --accent-lighter-blue: #F6F7FD;
+
+    --neutral-lighter: #1C1C1C;
+    --neutral-darker: #262626;
+    --neutral-black: #121212;
+
+    --accent-light-grey: #F2F2F2;
+    // --accent-purple: #6375AD;
+    --accent-purple: #4C6DF0;
+
+
+    //MAIN
+    --background: var(--neutral-lighter);
+    --background-light: var(--neutral-darker);
+    --text-color: #fff;
+    --primary-color: var(--accent-purple);
+
+
+    --color-info: #DAD4FB;
+    --color-error: #FACFDC;
+    --color-success: #D7EDE8;
+    --color-status-published: #D7EDE8;
+    --color-status-published-text: #2D8A57;
+    --color-status-draft: #FFF7D8;
+    --color-status-draft-text: #EFB900;
+  
+    /* spacing */
+    --space-4xs: clamp(0.125rem, calc(0.125rem + 0vw), 0.125rem);
+    --space-3xs: clamp(0.25rem, calc(0.25rem + 0vw), 0.25rem);
+    --space-2xs: clamp(0.5rem, calc(0.5rem + 0vw), 0.5rem);
+    --space-xs: clamp(0.75rem, calc(0.75rem + 0vw), 0.75rem);
+    --space-sm: clamp(1rem, calc(1rem + 0vw), 1rem);
+    --space-md: clamp(1.5rem, calc(1.125rem + 0.78125vw), 1.75rem);
+    --space-lg: clamp(2.25rem, calc(1.125rem + 2.34375vw), 3rem);
+    --space-xl: clamp(3.5rem, calc(1.25rem + 4.6875vw), 5rem);
+    --space-2xl: clamp(5.75rem, calc(2.375rem + 7.03125vw), 8rem);
+    --space-3xl: clamp(9.25rem, calc(4.75rem + 9.375vw), 12.25rem);
+    --space-4xl: clamp(15rem, calc(7.5rem + 15.625vw), 20rem);
+}

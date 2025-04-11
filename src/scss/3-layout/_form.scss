@@ -1,0 +1,27 @@
+form {
+    label {
+        color: var(--primary-color);
+    }
+
+    .p-inputtext {
+        background: var(--background-light);
+        color: var(--text-color);
+
+        &:hover,
+        &:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem var(--primary-color);
+        }
+    }
+
+}
+
+.p-dropdown-panel
+{
+    background: var(--background);
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+    background: var(--primary-color);
+    color: var(--text-color);
+}

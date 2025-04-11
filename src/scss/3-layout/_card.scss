@@ -1,0 +1,14 @@
+.card{
+    background-color: var(--background-light);
+    padding: var(--space-md);
+    border-radius: 1.5rem;
+    h2, h4{
+        margin-bottom: var(--space-sm);
+    }
+    &.width-shadow{
+        box-shadow: rgba(250, 250, 250, 0.1) 0px 0px 0px 1px, rgba(0, 0, 0, 0.06) 0px 0.1px 0.3px 0px, rgba(0, 0, 0, 0.12) 0px 1px 2px 0px;
+    }
+    &.w-100{
+        width: 100%;
+    }
+}
