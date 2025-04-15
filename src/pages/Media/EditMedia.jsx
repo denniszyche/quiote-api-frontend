@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { getUserRoles } from "../../utils/auth.js";
+import { useParams } from "react-router-dom";
 import Spinner from "../../components/Spinner";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
@@ -10,6 +9,7 @@ const EditMediaPage = () => {
     const { id } = useParams();
     const [formData, setFormData] = useState({
         filename: "",
+        filepath: "",
         caption: "",
         altText: "",
         size: "",
@@ -17,21 +17,7 @@ const EditMediaPage = () => {
         mimetype: "",
     });
     const toast = useRef(null);
-    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const checkAccess = () => {
-            const userRoles = getUserRoles();
-            const userCanAccess = userRoles.some((role) => role.name === "admin");
-            if (!userCanAccess) {
-                navigate("/dashboard");
-            } else {
-                setLoading(false);
-            }
-        };
-        checkAccess();
-    }, [navigate]);
 
     useEffect(() => {
         const fetchMedia = async () => {
@@ -52,12 +38,14 @@ const EditMediaPage = () => {
                 const data = await response.json();
                 setFormData({
                     filename: data.media.filename,
+                    filepath: data.media.filepath,
                     caption: data.media.caption,
                     altText: data.media.altText,
                     size: data.media.size,
                     user: data.media.user,
                     mimetype: data.media.mimetype,
                 });
+                setLoading(false);
             } catch (error) {
                 toast.current.show({
                     severity: "error",
@@ -151,12 +139,21 @@ const EditMediaPage = () => {
                             <h4>Edit Media</h4>
                             <div className="image-preview mb-3">
                                 <img 
-                                    src={formData.filename ? `http://localhost:3000/${formData.filename}` : "/images/cms-logo.svg"}
+                                    src={formData.filepath ? `http://localhost:3000/${formData.filepath}` : "/images/cms-logo.svg"}
                                     alt="Preview" 
                                     style={{ maxWidth: "100%", height: "auto" }} 
                                     />
                             </div>
-
+                            <label
+                                htmlFor="filename"
+                                className="text-secondary font-semibold block mb-3">
+                                Filename</label>
+                            <InputText
+                                id="filename"
+                                name="filename"
+                                value={formData.filename}
+                                onChange={handleChange}
+                                className="w-full p-calendar p-component p-inputwrapper mb-3"></InputText>
                             <label
                                 htmlFor="caption"
                                 className="text-secondary font-semibold block mb-3">

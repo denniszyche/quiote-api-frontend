@@ -150,8 +150,8 @@ const AllMediaPage = () => {
                         header="Thumbnail"
                         body={(rowData) => (
                             <Image 
-                                src={rowData.filename ? `http://localhost:3000/${rowData.filename}` : "/images/cms-logo.svg"}
-                                zoomSrc={rowData.filename ? `http://localhost:3000/${rowData.filename}` : "/images/cms-logo.svg"}
+                                src={rowData.filepath ? `http://localhost:3000/${rowData.filepath}` : "/images/cms-logo.svg"}
+                                zoomSrc={rowData.filepath ? `http://localhost:3000/${rowData.filepath}` : "/images/cms-logo.svg"}
                                 alt={rowData.altText || "Media Thumbnail"} 
                                 width="80" 
                                 height="80" 
@@ -164,12 +164,12 @@ const AllMediaPage = () => {
                         )}
                     />
                     <Column
-                        field="altText"
-                        header="Alt Text"
+                        field="filename"
+                        header="Filename"
                     />
                     <Column
-                        field="caption"
-                        header="Caption"
+                        field="altText"
+                        header="Alt Text"
                     />
                     <Column
                         field="updatedAt"

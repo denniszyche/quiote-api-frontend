@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Spinner";
+import MediaLibraryModal from "../../components/MediaLibraryModal";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
@@ -8,13 +9,15 @@ import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import { Checkbox } from "primereact/checkbox";
 import { InputSwitch } from 'primereact/inputswitch';
+import { Image } from 'primereact/image';
 
 const AddPostPage = () => {
     const [formData, setFormData] = useState({
         title: "",
         excerpt: "",
         content: "",
-        featureImage: null,
+        featuredImageId: null,
+        featuredImageUrl: "",
         featured: false,
         status: "draft",
         details: {},
@@ -24,6 +27,7 @@ const AddPostPage = () => {
     const toast = useRef(null);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    const [isMediaLibraryVisible, setIsMediaLibraryVisible] = useState(false);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -55,6 +59,38 @@ const AddPostPage = () => {
         };
         fetchCategories();
     }, []);
+
+    /**
+     * Handle the media library modal
+     * @param {*} e
+     */
+    const handleMediaSelect = async (imageId) => {
+        try {
+            const response = await fetch(`http://localhost:3000/media/${imageId}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+            if (!response.ok) {
+                throw new Error("Failed to fetch image details.");
+            }
+            const data = await response.json();
+            console.log("Image data:", data);
+            setFormData({
+                ...formData,
+                featuredImageId: imageId,
+                featuredImageUrl: `http://localhost:3000/${data.media.filepath}`,
+            });
+        } catch (error) {
+            console.error("Error fetching image details:", error);
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Failed to fetch image details.",
+            });
+        }
+    };
 
     /**
      * Handle Input change
@@ -210,10 +246,10 @@ const AddPostPage = () => {
                         
                             />
                             <div className="flex justify-content-end">
-                                <Button type="submit" label="Submit" />
+                                <Button type="submit" label="Save" />
                             </div>
                         </div>
-                        <div className="card width-shadow w-100">
+                        <div className="card width-shadow w-100 mb-3">
                             <h4>Categories</h4>
                             {categories.map((category, index) => (
                                 <div key={index} className="flex align-items-center m-2">
@@ -230,9 +266,42 @@ const AddPostPage = () => {
                                 </div>
                             ))}
                         </div>
+                        <div className="card width-shadow w-100 mb-3">
+                            <label 
+                                htmlFor="featuredImage"
+                                className="text-secondary font-semibold block mb-3">
+                                Featured Image</label>
+                                <Button
+                                    label="Select Image"
+                                    icon="pi pi-image"
+                                    onClick={() => setIsMediaLibraryVisible(true)}
+                                    className="p-button-sm"
+                                    type="button"
+                                />
+                                {formData.featuredImageUrl  && (
+                                    <div className="mt-3">
+                                        <Image 
+                                            src={formData.featuredImageUrl}
+                                            zoomSrc={formData.featuredImageUrl}
+                                            width="100" 
+                                            height="100" 
+                                            preview
+                                            style={{
+                                                objectFit: "cover",
+                                                backgroundColor: "#f0f0f0",
+                                            }}
+                                        />
+                                    </div>
+                                )}
+                        </div>
                     </div>
                 </div>
             </form>
+            <MediaLibraryModal
+                visible={isMediaLibraryVisible}
+                onHide={() => setIsMediaLibraryVisible(false)}
+                onSelect={handleMediaSelect}
+            />
         </>
     );
 };

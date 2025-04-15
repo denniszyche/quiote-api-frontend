@@ -91,7 +91,7 @@ const AllPostsPage = () => {
      * @param {*} rowData
      */
     const handleEdit = (rowData) => {
-        navigate(`/edit-absence/${rowData.id}`);
+        navigate(`/edit-post/${rowData.id}`);
     };
 
     /**
@@ -187,7 +187,6 @@ const AllPostsPage = () => {
                 <DataTable value={data}>
                     <Column field="id" header="ID" />
                     <Column field="title" header="Title" />
-    
                     <Column
                         field="categories"
                         header="Categories"

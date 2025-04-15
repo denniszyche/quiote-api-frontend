@@ -11,6 +11,7 @@ import { FileUpload } from 'primereact/fileupload';
 const AddMediaPage = () => {
     const [formData, setFormData] = useState({
         media: "",
+        filename: "",
         caption: "",
         altText: "",
     });
@@ -59,11 +60,20 @@ const AddMediaPage = () => {
             });
             return;
         }
+        if (!formData.filename) {
+            toast.current.show({
+                severity: "warn",
+                summary: "Validation Error",
+                detail: "Please enter a filename.",
+            });
+            return;
+        }
         try {
             const formDataToSend = new FormData();
             formDataToSend.append("media", formData.media);
             formDataToSend.append("caption", formData.caption);
             formDataToSend.append("altText", formData.altText);
+            formDataToSend.append("filename", formData.filename);
             const response = await fetch("http://localhost:3000/media/create-media", {
                 method: "POST",
                 headers: {
@@ -129,7 +139,16 @@ const AddMediaPage = () => {
                             <img src={imagePreview} alt="Preview" style={{ maxWidth: "100%", height: "auto" }} />
                         </div>
                     )}
-
+                    <label htmlFor="filename" className="block mb-3">
+                        Filename
+                    </label>
+                    <InputText
+                        id="filename"
+                        name="filename"
+                        value={formData.filename}
+                        onChange={handleChange}
+                        className="w-full mb-3">
+                    </InputText>
                     <label htmlFor="caption" className="block mb-3">
                         Caption
                     </label>

@@ -29,7 +29,7 @@ const AllCategories = () => {
     }, [navigate]);
 
     useEffect(() => {
-        fetch("http://localhost:2109/category/posts", {
+        fetch("http://localhost:3000/category/posts", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem("token")}`,
@@ -60,7 +60,7 @@ const AllCategories = () => {
      */
     const handleDelete = async (rowData) => {
         try {
-            const response = await fetch(`http://localhost:2109/category/post/${rowData.id}`, {
+            const response = await fetch(`http://localhost:3000/category/post/${rowData.id}`, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`,

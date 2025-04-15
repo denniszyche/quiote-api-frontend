@@ -12,9 +12,9 @@ import 'primeflex/primeflex.css';
 const Root = lazy(() => import("./pages/Root"));
 const LoginPage = lazy(() => import("./pages/Login"));
 const ErrorPage = lazy(() => import("./pages/Error"));
-const AllPostsPage = lazy(() => import("./pages/Absence/AllPosts"));
-const AddPostPage = lazy(() => import("./pages/Absence/AddPost"));
-const EditAbsencePage = lazy(() => import("./pages/Absence/EditAbsence"));
+const AllPostsPage = lazy(() => import("./pages/Post/AllPosts"));
+const AddPostPage = lazy(() => import("./pages/Post/AddPost"));
+const EditPostPage = lazy(() => import("./pages/Post/EditPost"));
 const AllCategoriesPage = lazy(() => import("./pages/Category/AllCategories"));
 const AddCategoryPage = lazy(() => import("./pages/Category/AddCategory"));
 const EditCategoryPage = lazy(() => import("./pages/Category/EditCategory"));
@@ -85,11 +85,11 @@ function App() {
                     ),
                 },
                 {
-                    path: "/edit-absence/:id",
+                    path: "/edit-post/:id",
                     element: (
                         <ProtectedRoute>
                             <Suspense fallback={<Spinner />}>
-                                <EditAbsencePage  />
+                                <EditPostPage  />
                             </Suspense>
                         </ProtectedRoute>
                     ),
