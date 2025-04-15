@@ -23,6 +23,9 @@ const SignUpPage = lazy(() => import("./pages/SignUp"));
 const AllUserPage = lazy(() => import("./pages/User/AllUser"));
 const AddUserPage = lazy(() => import("./pages/User/AddUser"));
 const EditUserPage = lazy(() => import("./pages/User/EditUser"));
+const AllMediaPage = lazy(() => import("./pages/Media/AllMedia"));
+const AddMediaPage = lazy(() => import("./pages/Media/AddMedia"));
+const EditMediaPage = lazy(() => import("./pages/Media/EditMedia"));
 
 function App() {
     const router = createBrowserRouter([
@@ -151,6 +154,36 @@ function App() {
                         </ProtectedRoute>
                     ),
                 },
+                {
+                    path: "/all-media",
+                    element: (
+                        <ProtectedRoute>
+                            <Suspense fallback={<Spinner />}>
+                                <AllMediaPage  />
+                            </Suspense>
+                        </ProtectedRoute>
+                    ),
+                },
+                {
+                    path: "/add-media",
+                    element: (
+                        <ProtectedRoute>
+                            <Suspense fallback={<Spinner />}>
+                                <AddMediaPage  />
+                            </Suspense>
+                        </ProtectedRoute>
+                    ),
+                },
+                {
+                    path: "/edit-media/:id",
+                    element: (
+                        <ProtectedRoute>
+                            <Suspense fallback={<Spinner />}>
+                                <EditMediaPage  />
+                            </Suspense>
+                        </ProtectedRoute>
+                    ),
+                }
             ],
         },
     ]);

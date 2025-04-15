@@ -9,15 +9,17 @@ import { Menu } from "primereact/menu";
 import { Toast } from "primereact/toast";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { format } from "date-fns";
+import { Image } from 'primereact/image';
 
-const AllPostsPage = () => {
+
+const AllMediaPage = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const toast = useRef(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch("http://localhost:3000/post/all-posts", {
+        fetch("http://localhost:3000/media/all-media", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem("token")}`,
@@ -25,7 +27,7 @@ const AllPostsPage = () => {
         })
             .then((response) => response.json())
             .then((data) => {
-                setData(data.posts);
+                setData(data.media);
                 setLoading(false);
             })
             .catch((error) => {
@@ -46,52 +48,11 @@ const AllPostsPage = () => {
     };
 
     /**
-     * Format the status to a tag
-     * @param {*} status
-     * @returns
-     */
-    const statusBodyTemplate = (status) => {
-        return <Tag value={status.status} severity={getStatusSeverity(status.status)} />;
-    };
-
-    /**
-     * Get the severity of the status
-     * @param {*} status
-     * @returns
-     */
-    const getStatusSeverity = (status) => {
-        switch (status) {
-            case "published":
-                return "success";
-
-            case "draft":
-                return "warning";
-
-            case "pending":
-                return "danger";
-
-            default:
-                return null;
-        }
-    };
-
-    /**
-     * Format the categories to a tag
-     * @param {*} categories 
-     * @returns 
-     */
-    const categoryBodyTemplate = (categories) => {
-        return categories.categories.map((category) => (
-            <Tag key={category.id} value={category.name} severity={"info"} rounded className="mr-1" />
-        ));
-    }
-
-    /**
      * Handle the edtit button click
      * @param {*} rowData
      */
     const handleEdit = (rowData) => {
-        navigate(`/edit-absence/${rowData.id}`);
+        navigate(`/edit-media/${rowData.id}`);
     };
 
     /**
@@ -100,7 +61,7 @@ const AllPostsPage = () => {
      */
     const handleDelete = async (rowData) => {
         try {
-            const response = await fetch(`http://localhost:3000/post/delete-post/${rowData.id}`, {
+            const response = await fetch(`http://localhost:3000/media/delete-media/${rowData.id}`, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`,
@@ -113,7 +74,7 @@ const AllPostsPage = () => {
             toast.current.show({
                 severity: "success",
                 summary: "Deleted",
-                detail: `Post with ID: ${rowData.id} has been deleted.`,
+                detail: `Media with ID: ${rowData.id} has been deleted.`,
                 zindex: 1000,
             });
         } catch (error) {
@@ -121,7 +82,7 @@ const AllPostsPage = () => {
             toast.current.show({
                 severity: "error",
                 summary: "Error",
-                detail: "Failed to delete the post.",
+                detail: "Failed to delete the media.",
                 zindex: 1000,
             });
         }
@@ -133,11 +94,11 @@ const AllPostsPage = () => {
      */
     const confirmDelete = (rowData) => {
         confirmDialog({
-            message: `Sind Sie sicher, dass Sie die Anfrage mit der ID ${rowData.id} löschen möchten?`,
-            header: "Anfrage löschen",
+            message: `Are you sure you want to delete the media with ID: ${rowData.id}?`,
+            header: "Confirm",
             icon: "pi pi-exclamation-triangle",
-            acceptLabel: "Ja, löschen",
-            rejectLabel: "Abbrechen",
+            acceptLabel: "Yes, Delete",
+            rejectLabel: "Cancel",
             accept: () => handleDelete(rowData),
         });
     };
@@ -173,7 +134,6 @@ const AllPostsPage = () => {
         );
     };
 
-
     if (loading) {
         return <Spinner />;
     }
@@ -181,33 +141,40 @@ const AllPostsPage = () => {
     return (
         <div className="flex">
             <div className="card width-shadow w-100">
-                <h4>All Posts</h4>
+                <h4>All Media</h4>
                 <Toast ref={toast} />
                 <ConfirmDialog />
                 <DataTable value={data}>
                     <Column field="id" header="ID" />
-                    <Column field="title" header="Title" />
-    
                     <Column
-                        field="categories"
-                        header="Categories"
-                        body={categoryBodyTemplate}
-                    ></Column>
-                    <Column field="featured" header="featured" />
-                    <Column
-                        field="user"
-                        header="User"
-                        body={(rowData) => `${rowData.user?.first_name || ''} ${rowData.user?.last_name || ''}`}
+                        header="Thumbnail"
+                        body={(rowData) => (
+                            <Image 
+                                src={rowData.filename ? `http://localhost:3000/${rowData.filename}` : "/images/cms-logo.svg"}
+                                zoomSrc={rowData.filename ? `http://localhost:3000/${rowData.filename}` : "/images/cms-logo.svg"}
+                                alt={rowData.altText || "Media Thumbnail"} 
+                                width="80" 
+                                height="80" 
+                                preview
+                                style={{
+                                    objectFit: "cover",
+                                    backgroundColor: "#f0f0f0",
+                                }}
+                            />
+                        )}
                     />
                     <Column
-                        field="status"
-                        header="Status"
-                        body={statusBodyTemplate}
-                    ></Column>
+                        field="altText"
+                        header="Alt Text"
+                    />
                     <Column
-                        field="createdAt"
-                        header="Created At"
-                        body={(rowData) => formatDate(rowData.createdAt)}
+                        field="caption"
+                        header="Caption"
+                    />
+                    <Column
+                        field="updatedAt"
+                        header="Updated"
+                        body={(rowData) => formatDate(rowData.updatedAt)}
                     />
                     <Column  body={actionBodyTemplate} />
                 </DataTable>
@@ -215,4 +182,4 @@ const AllPostsPage = () => {
         </div>
     );
 };
-export default AllPostsPage;
+export default AllMediaPage;

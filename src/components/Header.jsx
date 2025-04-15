@@ -15,6 +15,7 @@ const Header = () => {
             icon: 'pi pi-fw pi-home',
             command: () => navigate('/dashboard')
         },
+        { separator: true },
         ...(userRoles?.some(role => role.name === "admin" || role.name === "hr") ? [
         {
             label: 'User',
@@ -30,6 +31,7 @@ const Header = () => {
                 }
             ]
         },
+        { separator: true },
         ] : []),
         {
             label: 'Posts',
@@ -51,15 +53,31 @@ const Header = () => {
             icon: 'pi pi-tags',
             items: [
                 {
-                    label: 'Alle Kategorien',
+                    label: 'All Categories',
                     command: () => navigate('/all-categories')
                 },
                 {
-                    label: 'Kategorie hinzufügen',
+                    label: 'Add Category',
                     command: () => navigate('/add-category')
                 }
             ]
         },
+        { separator: true },
+        {
+            label: 'Media',
+            icon: 'pi pi-image',
+            items: [
+                {
+                    label: 'All Media',
+                    command: () => navigate('/all-media')
+                },
+                {
+                    label: 'Add Media',
+                    command: () => navigate('/add-media')
+                }
+            ]
+        },
+        { separator: true },
         ] : []),
         {
             label: 'Logout',
