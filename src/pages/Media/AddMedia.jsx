@@ -170,7 +170,7 @@ const AddMediaPage = () => {
                         className="w-full mb-3"
                     />
 
-                    <Button type="submit" label="Submit" />
+                    <Button type="submit" label="Save" />
                 </div>
             </form>
         </>

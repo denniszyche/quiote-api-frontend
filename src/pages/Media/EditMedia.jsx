@@ -213,7 +213,7 @@ const EditMediaPage = () => {
                                 disabled
                                 className="w-full p-calendar p-component p-inputwrapper mb-3"></InputText>
                             <div className="flex justify-content-end">
-                                <Button type="submit" label="Submit" />
+                                <Button type="submit" label="Save" />
                             </div>
                         </div>
 

@@ -3,11 +3,13 @@ import { Dialog } from "primereact/dialog";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
-import { Image } from 'primereact/image';
+import { Image } from "primereact/image";
+import { InputText } from "primereact/inputtext";
 
 const MediaLibraryModal = ({ visible, onHide, onSelect }) => {
     const [mediaFiles, setMediaFiles] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [globalFilter, setGlobalFilter] = useState(""); // State for search query
 
     useEffect(() => {
         const fetchMediaFiles = async () => {
@@ -47,37 +49,55 @@ const MediaLibraryModal = ({ visible, onHide, onSelect }) => {
             {loading ? (
                 <p>Loading...</p>
             ) : (
-                <DataTable value={mediaFiles} paginator rows={5}>
-                    <Column
-                        header="Thumbnail"
-                        body={(rowData) => (
-                            <Image 
-                                src={rowData.filepath ? `http://localhost:3000/${rowData.filepath}` : "/images/cms-logo.svg"}
-                                zoomSrc={rowData.filepath ? `http://localhost:3000/${rowData.filepath}` : "/images/cms-logo.svg"}
-                                alt={rowData.altText || "Media Thumbnail"} 
-                                width="80" 
-                                height="80" 
-                                preview
-                                style={{
-                                    objectFit: "cover",
-                                    backgroundColor: "#f0f0f0",
-                                }}
+                <>
+                    {/* Search Input */}
+                    <div className="mb-3">
+                        <span className="p-input-icon-left">
+                            <InputText
+                                value={globalFilter}
+                                onChange={(e) => setGlobalFilter(e.target.value)}
+                                placeholder="Search"
+                                className="w-full"
                             />
-                        )}
-                    />
-                    <Column field="filename" header="Filename" />
-                    <Column field="altText" header="Alt Text" />
-                    <Column
-                        header="Action"
-                        body={(rowData) => (
-                            <Button
-                                label="Select"
-                                onClick={() => handleSelect(rowData)}
-                                className="p-button-sm"
-                            />
-                        )}
-                    />
-                </DataTable>
+                        </span>
+                    </div>
+                    <DataTable
+                        value={mediaFiles}
+                        paginator
+                        rows={5}
+                        globalFilter={globalFilter}
+                    >
+                        <Column
+                            header="Thumbnail"
+                            body={(rowData) => (
+                                <Image
+                                    src={rowData.filepath ? `http://localhost:3000/${rowData.filepath}` : "/images/cms-logo.svg"}
+                                    zoomSrc={rowData.filepath ? `http://localhost:3000/${rowData.filepath}` : "/images/cms-logo.svg"}
+                                    alt={rowData.altText || "Media Thumbnail"}
+                                    width="80"
+                                    height="80"
+                                    preview
+                                    style={{
+                                        objectFit: "cover",
+                                        backgroundColor: "#f0f0f0",
+                                    }}
+                                />
+                            )}
+                        />
+                        <Column field="filename" header="Filename" />
+                        <Column field="altText" header="Alt Text" />
+                        <Column
+                            header="Action"
+                            body={(rowData) => (
+                                <Button
+                                    label="Select"
+                                    onClick={() => handleSelect(rowData)}
+                                    className="p-button-sm"
+                                />
+                            )}
+                        />
+                    </DataTable>
+                </>
             )}
         </Dialog>
     );
