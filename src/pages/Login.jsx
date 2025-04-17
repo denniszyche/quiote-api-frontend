@@ -78,11 +78,10 @@ const Login = () => {
                 <div className="flex flex-column md:flex-row">
                     <div className="w-full md:w-5 flex flex-column align-items-center justify-content-center gap-3 py-5">
                         <form onSubmit={handleSubmit}>
-                            
                             <label 
                                 htmlFor="email" 
                                 className="text-secondary font-semibold block mb-3">
-                                    Benutzer*in
+                                    E-Mail
                             </label>
                             <InputText 
                                 id="email" 
@@ -92,12 +91,10 @@ const Login = () => {
                                 onChange={handleChange}
                                 className="w-full p-calendar p-component p-inputwrapper mb-3"
                                 />
-                            
-                            
                             <label 
                                 htmlFor="password" 
                                 className="text-secondary font-semibold block mb-3">
-                                    Passwort
+                                    Password
                             </label>
                             <Password 
                                 value={formData.password}
@@ -117,7 +114,7 @@ const Login = () => {
                                 />
                             
                             <Button 
-                                label="Anmelden" 
+                                label="Login"
                                 icon="pi pi-user" 
                                 type="submit"
                                 className="w-12rem"

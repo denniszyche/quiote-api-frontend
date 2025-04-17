@@ -20,6 +20,8 @@ const EditPostPage = () => {
         content: "",
         featuredImageId: null,
         featuredImageUrl: "",
+        galleryImageIds: [],
+        galleryImageUrls: [],
         featured: false,
         status: "draft",
         details: {},
@@ -32,6 +34,7 @@ const EditPostPage = () => {
     const [error, setError] = useState(null);
     const toast = useRef(null);
     const [isMediaLibraryVisible, setIsMediaLibraryVisible] = useState(false);
+    const [isMediaLibraryGalleryVisible, setIsMediaLibraryGalleryVisible] = useState(false);
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -62,7 +65,6 @@ const EditPostPage = () => {
                         featuredImageUrl = `http://localhost:3000/${imageData.media.filepath}`;
                     }
                 }
-
                 setFormData({
                     ...formData,
                     title: data.post.title,
@@ -76,6 +78,14 @@ const EditPostPage = () => {
                     categories: data.post.categories.map((cat) => cat.id),
                     createdAt: data.post.createdAt,
                     updatedAt: data.post.updatedAt,
+                });
+                data.post.gallery.forEach((image) => {
+                    const imageUrl = `http://localhost:3000/${image.filepath}`;
+                    setFormData((prevState) => ({
+                        ...prevState,
+                        galleryImageUrls: [...prevState.galleryImageUrls, imageUrl],
+                        galleryImageIds: [...prevState.galleryImageIds, image.id],
+                    }));
                 });
             } catch (err) {
                 setError(err.message);
@@ -119,7 +129,7 @@ const EditPostPage = () => {
      * Handle the media library modal
      * @param {*} e
      */
-    const handleMediaSelect = async (imageId) => {
+    const handleFeaturedMediaSelect = async (imageId) => {
         try {
             const response = await fetch(`http://localhost:3000/media/${imageId}`, {
                 method: "GET",
@@ -145,6 +155,53 @@ const EditPostPage = () => {
                 detail: "Failed to fetch image details.",
             });
         }
+    };
+
+    /**
+     * Handle the media library modal for gallery
+     * @param {*} imageIds
+     */
+    const handleGalleryMediaSelect = async (imageIds) => {
+        try {
+            const imageUrls = await Promise.all(
+                imageIds.map(async (imageId) => {
+                    const response = await fetch(`http://localhost:3000/media/${imageId}`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    });
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch image details.");
+                    }
+                    const data = await response.json();
+                    return `http://localhost:3000/${data.media.filepath}`;
+                })
+            );
+            setFormData({
+                ...formData,
+                galleryImageIds: imageIds,
+                galleryImageUrls: imageUrls,
+            });
+        } catch (error) {
+            console.error("Error fetching image details:", error);
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Failed to fetch image details.",
+            });
+        }
+    }
+
+    /**
+     * Handle clear all gallery images
+     */
+    const handleClearAllGalleryImages = () => {
+        setFormData({
+            ...formData,
+            galleryImageUrls: [],
+            galleryImageIds: [], // Reset the IDs as well
+        });
     };
 
     /**
@@ -231,7 +288,7 @@ const EditPostPage = () => {
             <form onSubmit={handleSubmit}>
                 <div className="flex flex-column md:flex-row col-12 gap-3">
                     <div className="w-full md:w-8">
-                        <div className="card width-shadow w-100">
+                        <div className="card width-shadow w-100 mb-3">
                             <h4>New Post</h4>
                             <label 
                                 htmlFor="title"
@@ -270,6 +327,46 @@ const EditPostPage = () => {
                                 cols={30}
                                 className="w-full p-calendar p-component p-inputwrapper mb-3"
                             />
+                        </div>
+                        <div className="card width-shadow w-100">
+                            <label
+                                htmlFor="gallery"
+                                className="text-secondary font-semibold block mb-3">
+                                Gallery</label>
+                            <Button
+                                label="Select Images"
+                                icon="pi pi-image"
+                                onClick={() => setIsMediaLibraryGalleryVisible(true)}
+                                className="p-button-sm"
+                                type="button"
+                            />
+                            {formData.galleryImageUrls.length > 0 && (
+                                <div>
+                                    <div className="flex flex-wrap gap-2 mt-3 mb-3">
+                                        {formData.galleryImageUrls.map((url, index) => (
+                                            <Image
+                                                key={index}
+                                                src={url}
+                                                zoomSrc={url}
+                                                width="100"
+                                                height="100"
+                                                preview
+                                                style={{
+                                                    objectFit: "cover",
+                                                    backgroundColor: "#f0f0f0",
+                                                }}
+                                            />
+                                        ))} 
+                                    </div>
+                                    <Button
+                                        label="Clear All"
+                                        icon="pi pi-trash"
+                                        onClick={handleClearAllGalleryImages}
+                                        className="p-button-danger p-button-sm"
+                                        type="button"
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="w-full md:w-4">
@@ -382,7 +479,15 @@ const EditPostPage = () => {
             <MediaLibraryModal
                 visible={isMediaLibraryVisible}
                 onHide={() => setIsMediaLibraryVisible(false)}
-                onSelect={handleMediaSelect}
+                onSelect={handleFeaturedMediaSelect}
+                multiSelect={false}
+            />
+            <MediaLibraryModal
+                visible={isMediaLibraryGalleryVisible}
+                onHide={() => setIsMediaLibraryGalleryVisible(false)}
+                onSelect={handleGalleryMediaSelect}
+                multiSelect={true}
+                selectedMedia={formData.galleryImageIds} 
             />
         </>
     );

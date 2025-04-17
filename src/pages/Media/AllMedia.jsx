@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Spinner";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Tag } from "primereact/tag";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { Toast } from "primereact/toast";
@@ -139,9 +138,16 @@ const AllMediaPage = () => {
     }
 
     return (
+        
         <div className="flex">
             <div className="card width-shadow w-100">
                 <h4>All Media</h4>
+                <Button
+                    label="Add Media"
+                    icon="pi pi-plus"
+                    className="p-button-success mb-3"
+                    onClick={() => navigate("/add-media")}
+                />
                 <Toast ref={toast} />
                 <ConfirmDialog />
                 <DataTable value={data}>

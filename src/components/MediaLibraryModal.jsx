@@ -6,10 +6,11 @@ import { Button } from "primereact/button";
 import { Image } from "primereact/image";
 import { InputText } from "primereact/inputtext";
 
-const MediaLibraryModal = ({ visible, onHide, onSelect }) => {
+const MediaLibraryModal = ({ visible, onHide, onSelect, multiSelect = false, selectedMedia = [] }) => {
     const [mediaFiles, setMediaFiles] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [globalFilter, setGlobalFilter] = useState(""); // State for search query
+    const [globalFilter, setGlobalFilter] = useState("");
+    const [selectedMediaState, setSelectedMediaState] = useState(selectedMedia); 
 
     useEffect(() => {
         const fetchMediaFiles = async () => {
@@ -24,39 +25,58 @@ const MediaLibraryModal = ({ visible, onHide, onSelect }) => {
                     throw new Error("Failed to fetch media files.");
                 }
                 const data = await response.json();
-                setMediaFiles(data.media);
+                setMediaFiles(data.media || []);
+                const preSelectedMedia = data.media.filter((media) =>
+                    selectedMedia.includes(media.id)
+                );
+                setSelectedMediaState(preSelectedMedia);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching media files:", error);
                 setLoading(false);
             }
         };
-        fetchMediaFiles();
-    }, []);
 
-    const handleSelect = (media) => {
-        onSelect(media.id);
+        fetchMediaFiles();
+    }, [setSelectedMediaState]);
+
+    useEffect(() => {
+        const preSelectedMedia = mediaFiles.filter((media) =>
+            selectedMedia.includes(media.id)
+        );
+        setSelectedMediaState(preSelectedMedia);
+    }, [selectedMedia, mediaFiles]);
+
+    const handleConfirmSelection = () => {
+        if (multiSelect) {
+            const selectedMediaIds = selectedMediaState.map((media) => media.id);
+            onSelect(selectedMediaIds);
+        } else {
+            onSelect(selectedMediaState?.id);
+        }
         onHide();
     };
 
     return (
         <Dialog
-            header="Select Featured Image"
+            header={multiSelect ? "Select Media for Gallery" : "Select Featured Image"}
             visible={visible}
             style={{ width: "50vw" }}
             onHide={onHide}
         >
             {loading ? (
                 <p>Loading...</p>
+            ) : mediaFiles.length === 0 ? (
+                <p>No media files found.</p>
             ) : (
                 <>
-                    {/* Search Input */}
                     <div className="mb-3">
                         <span className="p-input-icon-left">
+                            <i className="pi pi-search" />
                             <InputText
                                 value={globalFilter}
                                 onChange={(e) => setGlobalFilter(e.target.value)}
-                                placeholder="Search"
+                                placeholder="Search by filename or alt text"
                                 className="w-full"
                             />
                         </span>
@@ -66,7 +86,11 @@ const MediaLibraryModal = ({ visible, onHide, onSelect }) => {
                         paginator
                         rows={5}
                         globalFilter={globalFilter}
+                        selection={selectedMediaState}
+                        onSelectionChange={(e) => setSelectedMediaState(e.value)}
+                        selectionMode={multiSelect ? "checkbox" : "single"}
                     >
+                        {multiSelect && <Column selectionMode="multiple" headerStyle={{ width: "3em" }} />}
                         <Column
                             header="Thumbnail"
                             body={(rowData) => (
@@ -86,17 +110,17 @@ const MediaLibraryModal = ({ visible, onHide, onSelect }) => {
                         />
                         <Column field="filename" header="Filename" />
                         <Column field="altText" header="Alt Text" />
-                        <Column
-                            header="Action"
-                            body={(rowData) => (
-                                <Button
-                                    label="Select"
-                                    onClick={() => handleSelect(rowData)}
-                                    className="p-button-sm"
-                                />
-                            )}
-                        />
                     </DataTable>
+                    {multiSelect && (
+                        <div className="mt-3 flex justify-content-end">
+                            <Button
+                                label="Confirm Selection"
+                                icon="pi pi-check"
+                                onClick={handleConfirmSelection}
+                                disabled={multiSelect ? selectedMediaState.length === 0 : !selectedMediaState}
+                            />
+                        </div>
+                    )}
                 </>
             )}
         </Dialog>
