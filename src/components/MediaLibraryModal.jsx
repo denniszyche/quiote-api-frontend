@@ -10,7 +10,7 @@ const MediaLibraryModal = ({ visible, onHide, onSelect, multiSelect = false, sel
     const [mediaFiles, setMediaFiles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [globalFilter, setGlobalFilter] = useState("");
-    const [selectedMediaState, setSelectedMediaState] = useState(selectedMedia); 
+    const [selectedMediaState, setSelectedMediaState] = useState(selectedMedia);
 
     useEffect(() => {
         const fetchMediaFiles = async () => {
@@ -26,10 +26,6 @@ const MediaLibraryModal = ({ visible, onHide, onSelect, multiSelect = false, sel
                 }
                 const data = await response.json();
                 setMediaFiles(data.media || []);
-                const preSelectedMedia = data.media.filter((media) =>
-                    selectedMedia.includes(media.id)
-                );
-                setSelectedMediaState(preSelectedMedia);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching media files:", error);
@@ -38,14 +34,18 @@ const MediaLibraryModal = ({ visible, onHide, onSelect, multiSelect = false, sel
         };
 
         fetchMediaFiles();
-    }, [setSelectedMediaState]);
+    }, []);
 
     useEffect(() => {
         const preSelectedMedia = mediaFiles.filter((media) =>
             selectedMedia.includes(media.id)
         );
-        setSelectedMediaState(preSelectedMedia);
-    }, [selectedMedia, mediaFiles]);
+
+        // Only update state if it has changed
+        if (JSON.stringify(preSelectedMedia) !== JSON.stringify(selectedMediaState)) {
+            setSelectedMediaState(preSelectedMedia);
+        }
+    }, [selectedMedia, mediaFiles, selectedMediaState]);
 
     const handleConfirmSelection = () => {
         if (multiSelect) {

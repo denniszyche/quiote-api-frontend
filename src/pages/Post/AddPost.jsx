@@ -22,8 +22,11 @@ const AddPostPage = () => {
         galleryImageUrls: [],
         featured: false,
         status: "draft",
-        details: {},
         categories: [],
+        translations: [
+            { language: "en", title: "", excerpt: "", content: "", details: {} },
+            { language: "es", title: "", excerpt: "", content: "", details: {} },
+        ],
     });
     const [categories, setCategories] = useState([]);
     const toast = useRef(null);
@@ -144,6 +147,18 @@ const AddPostPage = () => {
     };
 
     /**
+     * Handle translation change
+     * @param {*} index
+     * @param {*} field
+     * @param {*} value
+     */
+    const handleTranslationChange = (index, field, value) => {
+        const updatedTranslations = [...formData.translations];
+        updatedTranslations[index][field] = value;
+        setFormData({ ...formData, translations: updatedTranslations });
+    };
+
+    /**
      * Handle category change
      * @param {*} e
      */
@@ -162,11 +177,11 @@ const AddPostPage = () => {
      */
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.title) {
+        if (formData.translations.some(translation => !translation.title)) {
             toast.current.show({
                 severity: "warn",
                 summary: "Validation Error",
-                detail: "Bitte geben Sie einen Titel ein.",
+                detail: "Please enter a title in all languages.",
             });
             return;
         }
@@ -214,44 +229,43 @@ const AddPostPage = () => {
                 <div className="flex flex-column md:flex-row col-12 gap-3">
                     <div className="w-full md:w-8">
                         <div className="card width-shadow w-100 mb-3">
-                            <h4>New Post</h4>
-                            <label 
-                                htmlFor="title"
-                                className="text-secondary font-semibold block mb-3">
-                                Title</label>
-                            <InputText
-                                id="title"
-                                name="title"
-                                value={formData.title}
-                                onChange={handleChange}
-                                className="w-full p-calendar p-component p-inputwrapper mb-3"
-                            />
-                            <label 
-                                htmlFor="title"
-                                className="text-secondary font-semibold block mb-3">
-                                Content</label>
-                            <InputTextarea
-                                id="content"
-                                name="content"
-                                value={formData.content}
-                                onChange={handleChange}
-                                rows={5}
-                                cols={30}
-                                className="w-full p-calendar p-component p-inputwrapper mb-3"
-                            />
-                            <label 
-                                htmlFor="excerpt"
-                                className="text-secondary font-semibold block mb-3">
-                                Excerpt</label>
-                            <InputTextarea
-                                id="excerpt"
-                                name="excerpt"
-                                value={formData.excerpt}
-                                onChange={handleChange}
-                                rows={5}
-                                cols={30}
-                                className="w-full p-calendar p-component p-inputwrapper mb-3"
-                            />
+                            {formData.translations.map((translation, index) => (
+                                <div key={index} className="mb-4">
+                                    <h4>{translation.language.toUpperCase()}</h4>
+                                    <label htmlFor={`title-${translation.language}`} className="text-secondary font-semibold block mb-3">
+                                        Title ({translation.language})
+                                    </label>
+                                    <InputText
+                                        id={`title-${translation.language}`}
+                                        name="title"
+                                        value={translation.title}
+                                        onChange={(e) => handleTranslationChange(index, "title", e.target.value)}
+                                        className="w-full mb-3"
+                                    />
+                                    <label htmlFor={`excerpt-${translation.language}`} className="text-secondary font-semibold block mb-3">
+                                        Excerpt ({translation.language})
+                                    </label>
+                                    <InputTextarea
+                                        id={`excerpt-${translation.language}`}
+                                        name="excerpt"
+                                        value={translation.excerpt}
+                                        onChange={(e) => handleTranslationChange(index, "excerpt", e.target.value)}
+                                        rows={3}
+                                        className="w-full mb-3"
+                                    />
+                                    <label htmlFor={`content-${translation.language}`} className="text-secondary font-semibold block mb-3">
+                                        Content ({translation.language})
+                                    </label>
+                                    <InputTextarea
+                                        id={`content-${translation.language}`}
+                                        name="content"
+                                        value={translation.content}
+                                        onChange={(e) => handleTranslationChange(index, "content", e.target.value)}
+                                        rows={5}
+                                        className="w-full mb-3"
+                                    />
+                                </div>
+                            ))}
                         </div>
                         <div className="card width-shadow w-100">
                             <label

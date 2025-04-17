@@ -25,6 +25,7 @@ const AllPostsPage = () => {
         })
             .then((response) => response.json())
             .then((data) => {
+                console.log("Data loaded:", data);
                 setData(data.posts);
                 setLoading(false);
             })
@@ -85,6 +86,24 @@ const AllPostsPage = () => {
             <Tag key={category.id} value={category.name} severity={"info"} rounded className="mr-1" />
         ));
     }
+
+    /**
+     * Format the featured to a tag
+     * @param {*} rowData
+     * @returns
+     */
+    const featuredBodyTemplate = (rowData) => {
+        if (rowData.featured === 1 || rowData.featured === "1") {
+            return (
+                <Tag
+                    severity="success"
+                    icon="pi pi-check"
+                    rounded
+                />
+            );
+        }
+        return null;
+    };
 
     /**
      * Handle the edtit button click
@@ -186,13 +205,26 @@ const AllPostsPage = () => {
                 <ConfirmDialog />
                 <DataTable value={data}>
                     <Column field="id" header="ID" />
-                    <Column field="title" header="Title" />
+                    <Column
+                        field="title"
+                        header="Title"
+                        body={(rowData) => {
+                            const englishTranslation = rowData.translations?.find(
+                                (translation) => translation.language === "en"
+                            );
+                            return englishTranslation ? englishTranslation.title : "No Title";
+                        }}
+                    />
                     <Column
                         field="categories"
                         header="Categories"
                         body={categoryBodyTemplate}
                     ></Column>
-                    <Column field="featured" header="featured" />
+                    <Column 
+                        field="featured" 
+                        header="featured" 
+                        body={featuredBodyTemplate}
+                        />
                     <Column
                         field="user"
                         header="User"

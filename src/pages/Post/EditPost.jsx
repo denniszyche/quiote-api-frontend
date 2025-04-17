@@ -15,19 +15,19 @@ import { format } from "date-fns";
 const EditPostPage = () => {
     const { id } = useParams();
     const [formData, setFormData] = useState({
-        title: "",
-        excerpt: "",
-        content: "",
         featuredImageId: null,
         featuredImageUrl: "",
         galleryImageIds: [],
         galleryImageUrls: [],
         featured: false,
         status: "draft",
-        details: {},
         categories: [],
         createdAt: "",
         updatedAt: "",
+        translations: [
+            { language: "en", title: "", excerpt: "", content: "", details: {} },
+            { language: "es", title: "", excerpt: "", content: "", details: {} },
+        ],
     });
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -67,17 +67,21 @@ const EditPostPage = () => {
                 }
                 setFormData({
                     ...formData,
-                    title: data.post.title,
-                    excerpt: data.post.excerpt,
-                    content: data.post.content,
                     featuredImageId: data.post.featuredImageId,
                     featuredImageUrl, 
-                    featured: data.post.featured,
+                    featured: data.post.featured === 1 || data.post.featured === "1",
                     status: data.post.status,
-                    details: data.post.details,
                     categories: data.post.categories.map((cat) => cat.id),
                     createdAt: data.post.createdAt,
                     updatedAt: data.post.updatedAt,
+                    translations: data.post.translations
+                        .map((translation) => ({
+                        title: translation.title,
+                        excerpt: translation.excerpt,
+                        content: translation.content,
+                        details: translation.details,
+                        language: translation.language,
+                    })),
                 });
                 data.post.gallery.forEach((image) => {
                     const imageUrl = `http://localhost:3000/${image.filepath}`;
@@ -242,12 +246,23 @@ const EditPostPage = () => {
     };
 
     /**
+     * Handle translation change
+     * @param {*} index
+     * @param {*} field
+     * @param {*} value
+     */
+    const handleTranslationChange = (index, field, value) => {
+        const updatedTranslations = [...formData.translations];
+        updatedTranslations[index][field] = value;
+        setFormData({ ...formData, translations: updatedTranslations });
+    };
+
+    /**
      * Handle form submit
      * @param {*} e
      */
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
             const response = await fetch(`http://localhost:3000/post/update-post/${id}`, {
                 method: "PUT",
@@ -289,44 +304,43 @@ const EditPostPage = () => {
                 <div className="flex flex-column md:flex-row col-12 gap-3">
                     <div className="w-full md:w-8">
                         <div className="card width-shadow w-100 mb-3">
-                            <h4>New Post</h4>
-                            <label 
-                                htmlFor="title"
-                                className="text-secondary font-semibold block mb-3">
-                                Title</label>
-                            <InputText
-                                id="title"
-                                name="title"
-                                value={formData.title}
-                                onChange={handleChange}
-                                className="w-full p-calendar p-component p-inputwrapper mb-3"
-                            />
-                            <label 
-                                htmlFor="title"
-                                className="text-secondary font-semibold block mb-3">
-                                Content</label>
-                            <InputTextarea
-                                id="content"
-                                name="content"
-                                value={formData.content}
-                                onChange={handleChange}
-                                rows={5}
-                                cols={30}
-                                className="w-full p-calendar p-component p-inputwrapper mb-3"
-                            />
-                            <label 
-                                htmlFor="excerpt"
-                                className="text-secondary font-semibold block mb-3">
-                                Excerpt</label>
-                            <InputTextarea
-                                id="excerpt"
-                                name="excerpt"
-                                value={formData.excerpt}
-                                onChange={handleChange}
-                                rows={5}
-                                cols={30}
-                                className="w-full p-calendar p-component p-inputwrapper mb-3"
-                            />
+                            {formData.translations.map((translation, index) => (
+                                <div key={index} className="mb-4">
+                                    <h4>{translation.language.toUpperCase()}</h4>
+                                    <label htmlFor={`title-${translation.language}`} className="text-secondary font-semibold block mb-3">
+                                        Title ({translation.language})
+                                    </label>
+                                    <InputText
+                                        id={`title-${translation.language}`}
+                                        name="title"
+                                        value={translation.title}
+                                        onChange={(e) => handleTranslationChange(index, "title", e.target.value)}
+                                        className="w-full mb-3"
+                                    />
+                                    <label htmlFor={`excerpt-${translation.language}`} className="text-secondary font-semibold block mb-3">
+                                        Excerpt ({translation.language})
+                                    </label>
+                                    <InputTextarea
+                                        id={`excerpt-${translation.language}`}
+                                        name="excerpt"
+                                        value={translation.excerpt}
+                                        onChange={(e) => handleTranslationChange(index, "excerpt", e.target.value)}
+                                        rows={3}
+                                        className="w-full mb-3"
+                                    />
+                                    <label htmlFor={`content-${translation.language}`} className="text-secondary font-semibold block mb-3">
+                                        Content ({translation.language})
+                                    </label>
+                                    <InputTextarea
+                                        id={`content-${translation.language}`}
+                                        name="content"
+                                        value={translation.content}
+                                        onChange={(e) => handleTranslationChange(index, "content", e.target.value)}
+                                        rows={5}
+                                        className="w-full mb-3"
+                                    />
+                                </div>
+                            ))}
                         </div>
                         <div className="card width-shadow w-100">
                             <label
