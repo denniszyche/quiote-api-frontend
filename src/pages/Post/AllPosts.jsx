@@ -9,6 +9,7 @@ import { Menu } from "primereact/menu";
 import { Toast } from "primereact/toast";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { format } from "date-fns";
+        
 
 const AllPostsPage = () => {
     const [data, setData] = useState([]);

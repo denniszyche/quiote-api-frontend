@@ -11,6 +11,7 @@ import { Checkbox } from "primereact/checkbox";
 import { InputSwitch } from 'primereact/inputswitch';
 import { Image } from 'primereact/image';
 import { format } from "date-fns";
+import ContentEditor from "../../components/ContentEditor";
 
 const EditPostPage = () => {
     const { id } = useParams();
@@ -378,12 +379,11 @@ const EditPostPage = () => {
                                     <label htmlFor={`content-${translation.language}`} className="text-secondary font-semibold block mb-3">
                                         Content ({translation.language})
                                     </label>
-                                    <InputTextarea
+                                    <ContentEditor
                                         id={`content-${translation.language}`}
                                         name="content"
                                         value={translation.content}
-                                        onChange={(e) => handleTranslationChange(index, "content", e.target.value)}
-                                        rows={5}
+                                        onChange={(htmlValue) => handleTranslationChange(index, "content", htmlValue)}
                                         className="w-full mb-3"
                                     />
                                 </div>
