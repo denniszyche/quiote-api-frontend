@@ -1,0 +1,74 @@
+body{
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    margin: 0;
+}
+
+.p-button{
+    background-color: #fff;
+    border-color: #fff;
+    color: var(--neutral-black);
+
+    &:hover{
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+}
+h1, h2, h3, h4, h5, h6{
+    margin: 0;
+}
+h4{
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    font-weight: 600;
+}
+
+p{
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 400;
+    margin: 0;
+}
+
+.p-tag.p-tag-danger{
+    background-color: #FCEEF0;
+    color: #C72A41;
+}
+
+.p-tag.p-tag-warning{
+    background-color: #FFEDD5;
+    color: #C2410B;
+}
+
+.p-tag.p-tag-success{
+    background-color: #D1FAE5;
+    color: #065F46;
+}
+.p-tag.p-tag-info{
+    background-color: #E0E7FF;
+    color: #1E3A8A;
+}
+
+.color-red{
+    color: var(--accent-red);
+}
+
+.p-inputtext{
+    width: 100%;
+}
+
+.p-divider .p-divider-content{
+    background-color: var(--background-light);
+}
+
+.p-inputswitch.p-highlight .p-inputswitch-slider {
+    background: var(--primary-color);
+}
+
+.p-checkbox.p-highlight .p-checkbox-box {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
