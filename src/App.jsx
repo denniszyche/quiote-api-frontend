@@ -26,6 +26,9 @@ const EditUserPage = lazy(() => import("./pages/User/EditUser"));
 const AllMediaPage = lazy(() => import("./pages/Media/AllMedia"));
 const AddMediaPage = lazy(() => import("./pages/Media/AddMedia"));
 const EditMediaPage = lazy(() => import("./pages/Media/EditMedia"));
+const AllTagsPage = lazy(() => import("./pages/Tag/AllTags"));
+const AddTagPage = lazy(() => import("./pages/Tag/AddTag"));
+const EditTagPage = lazy(() => import("./pages/Tag/EditTag"));
 
 function App() {
     const router = createBrowserRouter([
@@ -183,7 +186,37 @@ function App() {
                             </Suspense>
                         </ProtectedRoute>
                     ),
-                }
+                },
+                {
+                    path: "/all-tags",
+                    element: (
+                        <ProtectedRoute>
+                            <Suspense fallback={<Spinner />}>
+                                <AllTagsPage  />
+                            </Suspense>
+                        </ProtectedRoute>
+                    ),
+                },
+                {
+                    path: "/add-tag",
+                    element: (
+                        <ProtectedRoute>
+                            <Suspense fallback={<Spinner />}>
+                                <AddTagPage  />
+                            </Suspense>
+                        </ProtectedRoute>
+                    ),
+                },
+                {
+                    path: "/edit-tag/:id",
+                    element: (
+                        <ProtectedRoute>
+                            <Suspense fallback={<Spinner />}>
+                                <EditTagPage  />
+                            </Suspense>
+                        </ProtectedRoute>
+                    ),
+                },
             ],
         },
     ]);

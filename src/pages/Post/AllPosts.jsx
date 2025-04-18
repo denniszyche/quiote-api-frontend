@@ -25,7 +25,6 @@ const AllPostsPage = () => {
         })
             .then((response) => response.json())
             .then((data) => {
-                console.log("Data loaded:", data);
                 setData(data.posts);
                 setLoading(false);
             })
@@ -82,10 +81,21 @@ const AllPostsPage = () => {
      * @returns 
      */
     const categoryBodyTemplate = (categories) => {
-        return categories.categories.map((category) => (
-            <Tag key={category.id} value={category.name} severity={"info"} rounded className="mr-1" />
-        ));
-    }
+        return categories.categories.map((category) => {
+            const englishTranslation = category.translations.find(
+                (translation) => translation.language === "en"
+            );
+            return (
+                <Tag
+                    key={category.id}
+                    value={englishTranslation ? englishTranslation.name : "No Name"}
+                    severity="info"
+                    rounded
+                    className="mr-1"
+                />
+            );
+        });
+    };
 
     /**
      * Format the featured to a tag
@@ -201,6 +211,12 @@ const AllPostsPage = () => {
         <div className="flex">
             <div className="card width-shadow w-100">
                 <h4>All Posts</h4>
+                <Button
+                    label="Add Post"
+                    icon="pi pi-plus"
+                    className="p-button-success mb-3"
+                    onClick={() => navigate("/add-post")}
+                />
                 <Toast ref={toast} />
                 <ConfirmDialog />
                 <DataTable value={data}>

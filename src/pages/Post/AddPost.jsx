@@ -23,12 +23,14 @@ const AddPostPage = () => {
         featured: false,
         status: "draft",
         categories: [],
+        tags: [],
         translations: [
             { language: "en", title: "", excerpt: "", content: "", details: {} },
             { language: "es", title: "", excerpt: "", content: "", details: {} },
         ],
     });
     const [categories, setCategories] = useState([]);
+    const [tags, setTags] = useState([]);
     const toast = useRef(null);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -39,7 +41,7 @@ const AddPostPage = () => {
         const fetchCategories = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:3000/category/posts",
+                    "http://localhost:3000/category/all-categories",
                     {
                         method: "GET",
                         headers: {
@@ -65,6 +67,38 @@ const AddPostPage = () => {
         };
         fetchCategories();
     }, []);
+
+    useEffect(() => {
+        const fetchTags = async () => {
+            try {
+                const response = await fetch(
+                    "http://localhost:3000/tag/all-tags",
+                    {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    }
+
+                );
+                if (!response.ok) {
+                    throw new Error("Failed to fetch tags.");
+                }
+                const data = await response.json();
+                setTags(data.tags);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching tags:", error);
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Failed to fetch tags.",
+                });
+            }
+        };
+        fetchTags();
+    }, []);
+    
 
     /**
      * Handle the media library modal
@@ -170,6 +204,19 @@ const AddPostPage = () => {
             _selectedCategories = _selectedCategories.filter(category => category.id !== e.value.id);
         setFormData({ ...formData, categories: _selectedCategories });
     };
+    
+    /**
+     * Handle tag change
+     * @param {*} e
+     */
+    const onTagChange = (e) => {
+        let _selectedTags = [...formData.tags || []];
+        if (e.checked)
+            _selectedTags.push(e.value);
+        else
+            _selectedTags = _selectedTags.filter(tag => tag.id !== e.value.id);
+        setFormData({ ...formData, tags: _selectedTags });
+    }
 
     /**
      * Handle form submit
@@ -345,7 +392,32 @@ const AddPostPage = () => {
                                         checked={formData.categories.some((item) => item.id === category.id)}
                                     />
                                     <label htmlFor={category.id} className="ml-2">
-                                        {category.name}
+                                        {category.translations.map((translation, index) => (
+                                            <span key={index} className="mr-2">
+                                                {translation.name} ({translation.language.toUpperCase()})
+                                            </span>
+                                        ))}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="card width-shadow w-100 mb-3">
+                            <h4>Tags</h4>
+                            {tags.map((tag, index) => (
+                                <div key={index} className="flex align-items-center m-2">
+                                    <Checkbox
+                                        inputId={tag.id}
+                                        name="tag"
+                                        value={tag}
+                                        onChange={onTagChange}
+                                        checked={formData.tags.some((item) => item.id === tag.id)}
+                                    />
+                                    <label htmlFor={tag.id} className="ml-2">
+                                        {tag.translations.map((translation, index) => (
+                                            <span key={index} className="mr-2">
+                                                {translation.name} ({translation.language.toUpperCase()})
+                                            </span>
+                                        ))}
                                     </label>
                                 </div>
                             ))}

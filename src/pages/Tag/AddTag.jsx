@@ -1,13 +1,12 @@
-import React, { useState, useRef, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
 import { getUserRoles } from "../../utils/auth.js";
 import Spinner from "../../components/Spinner";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
+import { useNavigate } from "react-router-dom";
 
-const EditCategory = () => {
-    const { id } = useParams();
+const AddTagPage = () => {
     const [formData, setFormData] = useState({
         translations: [
             { language: "en", name: ""},
@@ -17,7 +16,7 @@ const EditCategory = () => {
     const toast = useRef(null);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-
+    
     useEffect(() => {
         const checkAccess = () => {
             const userRoles = getUserRoles();
@@ -30,41 +29,6 @@ const EditCategory = () => {
         };
         checkAccess();
     }, [navigate]);
-    
-    useEffect(() => {
-        const fetchCategory = async () => {
-            try {
-                const response = await fetch(`http://localhost:3000/category/${id}`, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                    }
-                });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(
-                        errorData.message || "An unexpected error occurred."
-                    );
-                }
-                const data = await response.json();
-                setFormData({
-                    ...formData,
-                    translations: data.category.translations
-                        .map((translation) => ({
-                        name: translation.name,
-                        language: translation.language,
-                    })),
-                });
-            } catch (error) {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error.message,
-                });
-            }
-        }
-        fetchCategory();
-    }, [id]);
 
     /**
      * Handle translation change
@@ -93,8 +57,8 @@ const EditCategory = () => {
             return;
         }
         try {
-            const response = await fetch(`http://localhost:3000/category/update-category/${id}`, {
-                method: "PUT",
+            const response = await fetch("http://localhost:3000/tag/create-tag", {
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${localStorage.getItem("token")}`,
@@ -110,8 +74,11 @@ const EditCategory = () => {
             toast.current.show({
                 severity: "success",
                 summary: "Success",
-                detail: "Category updated successfully.",
+                detail: "Tag added successfully.",
             });
+            setTimeout(() => {
+                navigate("/all-tags");
+            }, 1500);
         } catch (error) {
             console.error("Error:", error);
             toast.current.show({
@@ -125,13 +92,13 @@ const EditCategory = () => {
     if (loading) {
         return <Spinner />;
     }
-
+    
     return (
         <>
             <Toast ref={toast} />
             <div className="flex">
                 <div className="card width-shadow">
-                    <h4>Edit Category</h4>
+                    <h4>Add Tag</h4>
                     <form onSubmit={handleSubmit}>
                         {formData.translations.map((translation, index) => (
                             <div key={index} className="field">
@@ -154,6 +121,5 @@ const EditCategory = () => {
             </div>
         </>
     );
-}
-
-export default EditCategory;
+};
+export default AddTagPage;

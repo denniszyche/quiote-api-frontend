@@ -9,7 +9,7 @@ import { Menu } from "primereact/menu";
 import { Toast } from "primereact/toast";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
-const AllCategories = () => {
+const AllTagsPage = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const toast = useRef(null);
@@ -31,7 +31,7 @@ const AllCategories = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://localhost:3000/category/all-categories", {
+                const response = await fetch("http://localhost:3000/tag/all-tags", {
                     headers: {
                         "Authorization": `Bearer ${localStorage.getItem("token")}`,
                     },
@@ -40,7 +40,8 @@ const AllCategories = () => {
                     throw new Error("Failed to fetch data.");
                 }
                 const result = await response.json();
-                setData(result.categories || []);   
+                console.log(result);
+                setData(result.tags || []);   
             } catch (error) {
                 console.error("Error fetching data:", error);
                 toast.current.show({
@@ -59,7 +60,7 @@ const AllCategories = () => {
      * @param {*} rowData
      */
     const handleEdit = (rowData) => {
-        navigate(`/edit-category/${rowData.id}`);
+        navigate(`/edit-tag/${rowData.id}`);
     };
 
     /**
@@ -68,7 +69,7 @@ const AllCategories = () => {
      */
     const handleDelete = async (rowData) => {
         try {
-            const response = await fetch(`http://localhost:3000/category/delete-category/${rowData.id}`, {
+            const response = await fetch(`http://localhost:3000/tag/delete-tag/${rowData.id}`, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`,
@@ -101,7 +102,7 @@ const AllCategories = () => {
      */
     const confirmDelete = (rowData) => {
         confirmDialog({
-            message: `Are you sure you want to delete the category with ID: ${rowData.id}?`,
+            message: `Are you sure you want to delete the tag with ID: ${rowData.id}?`,
             header: "Confirm Deletion",
             icon: "pi pi-exclamation-triangle",
             accept: () => handleDelete(rowData),
@@ -149,12 +150,12 @@ const AllCategories = () => {
             <ConfirmDialog />
             <div className="flex">
                 <div className="card width-shadow w-100">
-                    <h4>All Categories</h4>
+                    <h4>All Tags</h4>
                     <Button
-                        label="Add Category"
+                        label="Add Tag"
                         icon="pi pi-plus"
                         className="p-button-success mb-3"
-                        onClick={() => navigate("/add-category")}
+                        onClick={() => navigate("/add-tag")}
                     />
                     <DataTable value={data}>
                         <Column field="id" header="ID" />
@@ -186,4 +187,4 @@ const AllCategories = () => {
     );
 }
 
-export default AllCategories;
+export default AllTagsPage;

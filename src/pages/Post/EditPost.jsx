@@ -22,6 +22,7 @@ const EditPostPage = () => {
         featured: false,
         status: "draft",
         categories: [],
+        tags: [],
         createdAt: "",
         updatedAt: "",
         translations: [
@@ -30,6 +31,7 @@ const EditPostPage = () => {
         ],
     });
     const [categories, setCategories] = useState([]);
+    const [tags, setTags] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const toast = useRef(null);
@@ -72,6 +74,7 @@ const EditPostPage = () => {
                     featured: data.post.featured === 1 || data.post.featured === "1",
                     status: data.post.status,
                     categories: data.post.categories.map((cat) => cat.id),
+                    tags: data.post.tags.map((tag) => tag.id),
                     createdAt: data.post.createdAt,
                     updatedAt: data.post.updatedAt,
                     translations: data.post.translations
@@ -104,7 +107,7 @@ const EditPostPage = () => {
         const fetchCategories = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:3000/category/posts",
+                    "http://localhost:3000/category/all-categories",
                     {
                         method: "GET",
                         headers: {
@@ -122,12 +125,42 @@ const EditPostPage = () => {
                 toast.current.show({
                     severity: "error",
                     summary: "Error",
-                    detail: "Kategorien konnten nicht geladen werden.",
+                    detail: "Categories could not be loaded.",
                 });
             }
         };
         fetchCategories();
     }, []);
+
+    useEffect(() => {
+        const fetchTags = async () => {
+            try {
+                const response = await fetch(
+                    "http://localhost:3000/tag/all-tags",
+                    {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    }
+                );
+                if (!response.ok) {
+                    throw new Error("Failed to fetch categories.");
+                }
+                const data = await response.json();
+                setTags(data.tags);
+            } catch (error) {
+                console.error("Error tags categories:", error);
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Tags could not be loaded.",
+                });
+            }
+        };
+        fetchTags();
+    }, []);
+
 
     /**
      * Handle the media library modal
@@ -204,7 +237,7 @@ const EditPostPage = () => {
         setFormData({
             ...formData,
             galleryImageUrls: [],
-            galleryImageIds: [], // Reset the IDs as well
+            galleryImageIds: [],
         });
     };
 
@@ -221,6 +254,20 @@ const EditPostPage = () => {
         }
         setFormData({ ...formData, categories: _selectedCategories });
     };
+
+    /**
+     * Handle tag change
+     * @param {*} e
+     */
+    const onTagChange = (e) => {
+        let _selectedTags = [...formData.tags || []];
+        if (e.checked) {
+            _selectedTags.push(e.value);
+        } else {
+            _selectedTags = _selectedTags.filter((id) => id !== e.value);
+        }
+        setFormData({ ...formData, tags: _selectedTags });
+    }
 
     /**
      * Format the date to dd/MM/yyyy
@@ -449,12 +496,36 @@ const EditPostPage = () => {
                                         inputId={category.id}
                                         name="category"
                                         value={category.id} 
-
                                         onChange={onCategoryChange}
                                         checked={formData.categories.includes(category.id)}
                                     />
                                     <label htmlFor={category.id} className="ml-2">
-                                        {category.name}
+                                        {category.translations.map((translation, index) => (
+                                            <span key={index} className="mr-2">
+                                                {translation.name} ({translation.language.toUpperCase()})
+                                            </span>
+                                        ))}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="card width-shadow w-100 mb-3">
+                            <h4>Tags</h4>
+                            {tags.map((tag) => (
+                                <div key={tag.id} className="flex align-items-center m-2">
+                                    <Checkbox
+                                        inputId={tag.id}
+                                        name="tag"
+                                        value={tag.id} 
+                                        onChange={onTagChange}
+                                        checked={formData.tags.includes(tag.id)}
+                                    />
+                                    <label htmlFor={tag.id} className="ml-2">
+                                        {tag.translations.map((translation, index) => (
+                                            <span key={index} className="mr-2">
+                                                {translation.name} ({translation.language.toUpperCase()})
+                                            </span>
+                                        ))}
                                     </label>
                                 </div>
                             ))}

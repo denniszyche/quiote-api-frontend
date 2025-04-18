@@ -49,7 +49,7 @@ const Header = () => {
         },
         ...(userRoles?.some(role => role.name === "admin" ) ? [
         {
-            label: 'Kategorie',
+            label: 'Categories',
             icon: 'pi pi-tags',
             items: [
                 {
@@ -59,6 +59,20 @@ const Header = () => {
                 {
                     label: 'Add Category',
                     command: () => navigate('/add-category')
+                }
+            ]
+        },
+        {
+            label: 'Tags',
+            icon: 'pi pi-tags',
+            items: [
+                {
+                    label: 'All Tags',
+                    command: () => navigate('/all-tags')
+                },
+                {
+                    label: 'Add Tag',
+                    command: () => navigate('/add-tag')
                 }
             ]
         },

@@ -8,7 +8,10 @@ import { useNavigate } from "react-router-dom";
 
 const AddCategory = () => {
     const [formData, setFormData] = useState({
-        name: "",
+        translations: [
+            { language: "en", name: ""},
+            { language: "es", name: ""},
+        ],
     });
     const toast = useRef(null);
     const navigate = useNavigate();
@@ -28,15 +31,15 @@ const AddCategory = () => {
     }, [navigate]);
 
     /**
-     * Handle Input change
-     * @param {*} e
+     * Handle translation change
+     * @param {*} index
+     * @param {*} field
+     * @param {*} value
      */
-    const handleChange = (e) => {
-        const { name, value } = e.target || e;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
+    const handleTranslationChange = (index, field, value) => {
+        const updatedTranslations = [...formData.translations];
+        updatedTranslations[index][field] = value;
+        setFormData({ ...formData, translations: updatedTranslations });
     };
 
     /**
@@ -45,24 +48,16 @@ const AddCategory = () => {
      */
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.name) {
+        if (formData.translations.some((translation) => !translation.name)) {
             toast.current.show({
-                severity: "warn",
-                summary: "Validation Error",
-                detail: "Bitte geben Sie einen Namen ein.",
-            });
-            return;
-        }
-        if (formData.name.length < 3) {
-            toast.current.show({
-                severity: "warn",
-                summary: "Validation Error",
-                detail: "Der Name muss mindestens 3 Zeichen lang sein.",
+                severity: "error",
+                summary: "Error",
+                detail: "Please enter a name in all languages.",
             });
             return;
         }
         try {
-            const response = await fetch("http://localhost:3000/category/post", {
+            const response = await fetch("http://localhost:3000/category/create-category", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -79,7 +74,7 @@ const AddCategory = () => {
             toast.current.show({
                 severity: "success",
                 summary: "Success",
-                detail: "Kategorie erfolgreich hinzugefügt",
+                detail: "Category added successfully.",
             });
             setTimeout(() => {
                 navigate("/all-categories");
@@ -103,19 +98,23 @@ const AddCategory = () => {
             <Toast ref={toast} />
             <div className="flex">
                 <div className="card width-shadow">
-                    <h4>Kategorie hinzufügen</h4>
+                    <h4>Add Category</h4>
                     <form onSubmit={handleSubmit}>
-                        <label 
-                            htmlFor="name"
-                            className="text-secondary font-semibold block mb-3">
-                            Name</label>
-                        <InputText
-                            id="name"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className="w-full p-calendar p-component p-inputwrapper mb-3"
-                        />
+                        {formData.translations.map((translation, index) => (
+                            <div key={index} className="field">
+                                <label htmlFor={`name-${translation.language}`}>
+                                    Name ({translation.language})
+                                </label>
+                                <InputText
+                                    id={`name-${translation.language}`}
+                                    name={`name-${translation.language}`}
+                                    value={translation.name}
+                                    onChange={(e) => handleTranslationChange(index, "name", e.target.value)}
+                                    required
+                                    className="w-full"
+                                />
+                            </div>
+                        ))}
                         <Button type="submit" label="Submit" />
                     </form>
                 </div>

@@ -6,7 +6,7 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 
-const EditCategory = () => {
+const EditTagPage = () => {
     const { id } = useParams();
     const [formData, setFormData] = useState({
         translations: [
@@ -32,9 +32,9 @@ const EditCategory = () => {
     }, [navigate]);
     
     useEffect(() => {
-        const fetchCategory = async () => {
+        const fetchTag = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/category/${id}`, {
+                const response = await fetch(`http://localhost:3000/tag/${id}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${localStorage.getItem("token")}`,
@@ -49,7 +49,7 @@ const EditCategory = () => {
                 const data = await response.json();
                 setFormData({
                     ...formData,
-                    translations: data.category.translations
+                    translations: data.tag.translations
                         .map((translation) => ({
                         name: translation.name,
                         language: translation.language,
@@ -63,7 +63,7 @@ const EditCategory = () => {
                 });
             }
         }
-        fetchCategory();
+        fetchTag();
     }, [id]);
 
     /**
@@ -93,7 +93,7 @@ const EditCategory = () => {
             return;
         }
         try {
-            const response = await fetch(`http://localhost:3000/category/update-category/${id}`, {
+            const response = await fetch(`http://localhost:3000/tag/update-tag/${id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -110,7 +110,7 @@ const EditCategory = () => {
             toast.current.show({
                 severity: "success",
                 summary: "Success",
-                detail: "Category updated successfully.",
+                detail: "Tag updated successfully.",
             });
         } catch (error) {
             console.error("Error:", error);
@@ -131,7 +131,7 @@ const EditCategory = () => {
             <Toast ref={toast} />
             <div className="flex">
                 <div className="card width-shadow">
-                    <h4>Edit Category</h4>
+                    <h4>Edit Tag</h4>
                     <form onSubmit={handleSubmit}>
                         {formData.translations.map((translation, index) => (
                             <div key={index} className="field">
@@ -156,4 +156,4 @@ const EditCategory = () => {
     );
 }
 
-export default EditCategory;
+export default EditTagPage;
