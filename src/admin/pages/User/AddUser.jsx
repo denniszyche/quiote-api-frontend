@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { getUserRoles } from "../../utils/auth.js";
+import { getUserRoles } from "../../../utils/auth.js";
 import Spinner from "../../components/Spinner";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
@@ -7,6 +7,7 @@ import { Toast } from "primereact/toast";
 import { useNavigate } from "react-router-dom";
 import { Dropdown } from "primereact/dropdown";
 import { Password } from 'primereact/password';
+import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const AddUserPage = () => {
     const [formData, setFormData] = useState({
@@ -38,21 +39,13 @@ const AddUserPage = () => {
     useEffect(() => { // Fetch User Roles 
         const fetchRoles = async () => {
             try {
-                const response = await fetch(
-                    "http://localhost:3000/user/roles",
-                    {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                        },
-                    }
-
-                );
-                if (!response.ok) {
-                    throw new Error("Failed to fetch user roles.");
-                }
-                const data = await response.json();
-                setUserRoles(data.roles);
+                const response = await fetchFromApi("/user/roles", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });
+                setUserRoles(response.roles);
             } catch (error) {
                 console.error("Error fetching categories:", error);
                 toast.current.show({
@@ -124,7 +117,7 @@ const AddUserPage = () => {
             return;
         }
         try {
-            const response = await fetch("http://localhost:3000/user/post", {
+            await fetchFromApi("/user/create-user", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -132,12 +125,6 @@ const AddUserPage = () => {
                 },
                 body: JSON.stringify(formData),
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                    errorData.message || "An unexpected error occurred."
-                );
-            }
             toast.current.show({
                 severity: "success",
                 summary: "Success",

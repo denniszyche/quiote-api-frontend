@@ -1,0 +1,10 @@
+.page-content {
+    overflow: hidden;
+    position: relative;
+    height: 100vh;
+}
+
+.page-content__main {
+    position: relative;
+    will-change: transform;
+}

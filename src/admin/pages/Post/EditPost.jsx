@@ -12,6 +12,7 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { Image } from 'primereact/image';
 import { format } from "date-fns";
 import ContentEditor from "../../components/ContentEditor";
+import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const EditPostPage = () => {
     const { id } = useParams();
@@ -21,14 +22,23 @@ const EditPostPage = () => {
         galleryImageIds: [],
         galleryImageUrls: [],
         featured: false,
-        status: "draft",
+        status: "",
+        post_type: "",
         categories: [],
         tags: [],
         createdAt: "",
         updatedAt: "",
         translations: [
-            { language: "en", title: "", excerpt: "", content: "", details: {} },
-            { language: "es", title: "", excerpt: "", content: "", details: {} },
+            { language: "en", title: "", excerpt: "", content: "", details: {
+                city: "",
+                country: "",
+                status: ""
+            } },
+            { language: "es", title: "", excerpt: "", content: "", details: {
+                city: "",
+                country: "",
+                status: ""
+            } },
         ],
     });
     const [categories, setCategories] = useState([]);
@@ -41,53 +51,51 @@ const EditPostPage = () => {
 
     useEffect(() => {
         const fetchPost = async () => {
+
+            console.log("Fetching post data...");
             try {
-                const response = await fetch(`http://localhost:3000/post/${id}`, 
-                    {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                        },
-                    }
-                );
-                if (!response.ok) {
-                    throw new Error("Failed to fetch absence");
-                }
-                const data = await response.json();
-                
+                const response = await fetchFromApi(`/post/${id}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });
                 let featuredImageUrl = "";
-                if (data.post.featuredImageId) {
-                    const imageResponse = await fetch(`http://localhost:3000/media/${data.post.featuredImageId}`, {
+                if (response.post.featuredImageId) {
+                    const imageResponse = await fetchFromApi(`/media/${data.post.featuredImageId}`, {
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${localStorage.getItem("token")}`,
                         },
                     });
-                    if (imageResponse.ok) {
-                        const imageData = await imageResponse.json();
-                        featuredImageUrl = `http://localhost:3000/${imageData.media.filepath}`;
-                    }
+                    featuredImageUrl = `http://localhost:3000/${imageResponse.media.filepath}`;
                 }
                 setFormData({
                     ...formData,
-                    featuredImageId: data.post.featuredImageId,
+                    featuredImageId: response.post.featuredImageId,
                     featuredImageUrl, 
-                    featured: data.post.featured === 1 || data.post.featured === "1",
-                    status: data.post.status,
-                    categories: data.post.categories.map((cat) => cat.id),
-                    tags: data.post.tags.map((tag) => tag.id),
-                    createdAt: data.post.createdAt,
-                    updatedAt: data.post.updatedAt,
-                    translations: data.post.translations
+                    featured: response.post.featured === 1 || response.post.featured === "1",
+                    status: response.post.status,
+                    post_type: response.post.post_type,
+                    categories: response.post.categories.map((cat) => cat.id),
+                    tags: response.post.tags.map((tag) => tag.id),
+                    createdAt: response.post.createdAt,
+                    updatedAt: response.post.updatedAt,
+                    translations: response.post.translations
                         .map((translation) => ({
                         title: translation.title,
                         excerpt: translation.excerpt,
                         content: translation.content,
-                        details: translation.details,
                         language: translation.language,
+                        details: {
+                            city: translation.details.city,
+                            country: translation.details.country,
+                            status: translation.details.status,
+                        }
                     })),
                 });
-                data.post.gallery.forEach((image) => {
+
+                response.post.gallery.forEach((image) => {
                     const imageUrl = `http://localhost:3000/${image.filepath}`;
                     setFormData((prevState) => ({
                         ...prevState,
@@ -107,20 +115,13 @@ const EditPostPage = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await fetch(
-                    "http://localhost:3000/category/all-categories",
-                    {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                        },
-                    }
-                );
-                if (!response.ok) {
-                    throw new Error("Failed to fetch categories.");
-                }
-                const data = await response.json();
-                setCategories(data.categories);
+                const response = await fetchFromApi("/category/all-categories", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });
+                setCategories(response.categories);
             } catch (error) {
                 console.error("Error fetching categories:", error);
                 toast.current.show({
@@ -136,20 +137,13 @@ const EditPostPage = () => {
     useEffect(() => {
         const fetchTags = async () => {
             try {
-                const response = await fetch(
-                    "http://localhost:3000/tag/all-tags",
-                    {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                        },
-                    }
-                );
-                if (!response.ok) {
-                    throw new Error("Failed to fetch categories.");
-                }
-                const data = await response.json();
-                setTags(data.tags);
+                const response = await fetchFromApi("/tag/all-tags", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });
+                setTags(response.tags);
             } catch (error) {
                 console.error("Error tags categories:", error);
                 toast.current.show({
@@ -168,31 +162,32 @@ const EditPostPage = () => {
      * @param {*} e
      */
     const handleFeaturedMediaSelect = async (imageId) => {
-        try {
-            const response = await fetch(`http://localhost:3000/media/${imageId}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
-            if (!response.ok) {
-                throw new Error("Failed to fetch image details.");
-            }
-            const data = await response.json();
-            console.log("Image data:", data);
-            setFormData({
-                ...formData,
-                featuredImageId: imageId,
-                featuredImageUrl: `http://localhost:3000/${data.media.filepath}`,
-            });
-        } catch (error) {
-            console.error("Error fetching image details:", error);
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: "Failed to fetch image details.",
-            });
-        }
+        // try {
+
+        //     const response = await fetchFromApi(`/media/${imageId}`, {
+        //         method: "GET",
+        //         headers: {
+        //             "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        //         },
+        //     });
+        //     if (!response.ok) {
+        //         throw new Error("Failed to fetch image details.");
+        //     }
+        //     const data = await response.json();
+        //     console.log("Image data:", data);
+        //     setFormData({
+        //         ...formData,
+        //         featuredImageId: imageId,
+        //         featuredImageUrl: `http://localhost:3000/${data.media.filepath}`,
+        //     });
+        // } catch (error) {
+        //     console.error("Error fetching image details:", error);
+        //     toast.current.show({
+        //         severity: "error",
+        //         summary: "Error",
+        //         detail: "Failed to fetch image details.",
+        //     });
+        // }
     };
 
     /**
@@ -312,7 +307,16 @@ const EditPostPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`http://localhost:3000/post/update-post/${id}`, {
+            // const response = await fetch(`http://localhost:3000/post/update-post/${id}`, {
+            //     method: "PUT",
+            //     headers: {
+            //         "Content-Type": "application/json",
+            //         "Authorization": `Bearer ${localStorage.getItem("token")}`,
+            //     },
+            //     body: JSON.stringify(formData),
+            // });
+
+            await fetchFromApi(`/post/update-post/${id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -320,12 +324,6 @@ const EditPostPage = () => {
                 },
                 body: JSON.stringify(formData),
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                    errorData.message || "An unexpected error occurred."
-                );
-            }
             toast.current.show({
                 severity: "success",
                 summary: "Success",
@@ -449,6 +447,23 @@ const EditPostPage = () => {
                                 placeholder="Select a status"
                                 className="w-full mb-3"
                             />
+                            <label 
+                                htmlFor="status"
+                                className="text-secondary font-semibold block mb-3">
+                                Post Type</label>
+                            <Dropdown
+                                id="post_type"
+                                name="post_type"
+                                value={formData.post_type}
+                                options={[
+                                    { label: "View", value: "view" },
+                                    { label: "Link", value: "link" },
+                                    { label: "Plain", value: "plain" },
+                                ]}
+                                onChange={handleChange}
+                                placeholder="Select a status"
+                                className="w-full mb-3"
+                            />
                             <label
                                 htmlFor="createdAt"
                                 className="text-secondary font-semibold block mb-3">
@@ -487,6 +502,34 @@ const EditPostPage = () => {
                             <div className="flex justify-content-end">
                                 <Button type="submit" label="Save" />
                             </div>
+                        </div>
+                        <div className="card width-shadow w-100 mb-3">
+                            <label 
+                                htmlFor="featuredImage"
+                                className="text-secondary font-semibold block mb-3">
+                                Featured Image</label>
+                                <Button
+                                    label="Select Image"
+                                    icon="pi pi-image"
+                                    onClick={() => setIsMediaLibraryVisible(true)}
+                                    className="p-button-sm"
+                                    type="button"
+                                />
+                                {formData.featuredImageUrl  && (
+                                    <div className="mt-3">
+                                        <Image 
+                                            src={formData.featuredImageUrl}
+                                            zoomSrc={formData.featuredImageUrl}
+                                            width="100" 
+                                            height="100" 
+                                            preview
+                                            style={{
+                                                objectFit: "cover",
+                                                backgroundColor: "#f0f0f0",
+                                            }}
+                                        />
+                                    </div>
+                                )}
                         </div>
                         <div className="card width-shadow w-100 mb-3">
                             <h4>Categories</h4>
@@ -530,33 +573,43 @@ const EditPostPage = () => {
                                 </div>
                             ))}
                         </div>
+
                         <div className="card width-shadow w-100 mb-3">
-                            <label 
-                                htmlFor="featuredImage"
-                                className="text-secondary font-semibold block mb-3">
-                                Featured Image</label>
-                                <Button
-                                    label="Select Image"
-                                    icon="pi pi-image"
-                                    onClick={() => setIsMediaLibraryVisible(true)}
-                                    className="p-button-sm"
-                                    type="button"
-                                />
-                                {formData.featuredImageUrl  && (
-                                    <div className="mt-3">
-                                        <Image 
-                                            src={formData.featuredImageUrl}
-                                            zoomSrc={formData.featuredImageUrl}
-                                            width="100" 
-                                            height="100" 
-                                            preview
-                                            style={{
-                                                objectFit: "cover",
-                                                backgroundColor: "#f0f0f0",
-                                            }}
-                                        />
-                                    </div>
-                                )}
+                            <h4>Details</h4>
+                            {formData.translations.map((translation, index) => (
+                                <div key={index} className="mb-4">
+                                    <label htmlFor={`city-${translation.language}`} className="text-secondary font-semibold block mb-3">
+                                        City ({translation.language})
+                                    </label>
+                                    <InputText
+                                        id={`city-${translation.language}`}
+                                        name="city"
+                                        value={translation.details.city}
+                                        onChange={(e) => handleTranslationChange(index, "details", { ...translation.details, city: e.target.value })}
+                                        className="w-full mb-3"
+                                    />
+                                    <label htmlFor={`country-${translation.language}`} className="text-secondary font-semibold block mb-3">
+                                        Country ({translation.language})
+                                    </label>
+                                    <InputText
+                                        id={`country-${translation.language}`}
+                                        name="country"
+                                        value={translation.details.country}
+                                        onChange={(e) => handleTranslationChange(index, "details", { ...translation.details, country: e.target.value })}
+                                        className="w-full mb-3"
+                                    />
+                                    <label htmlFor={`status-${translation.language}`} className="text-secondary font-semibold block mb-3">
+                                        Status ({translation.language})
+                                    </label>
+                                    <InputText
+                                        id={`status-${translation.language}`}
+                                        name="status"
+                                        value={translation.details.status}
+                                        onChange={(e) => handleTranslationChange(index, "details", { ...translation.details, status: e.target.value })}
+                                        className="w-full mb-3"
+                                    />
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>

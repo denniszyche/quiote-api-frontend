@@ -9,6 +9,7 @@ import { Toast } from "primereact/toast";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { format } from "date-fns";
 import { Image } from 'primereact/image';
+import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 
 const AllMediaPage = () => {
@@ -18,21 +19,28 @@ const AllMediaPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetch("http://localhost:3000/media/all-media", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem("token")}`,
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                setData(data.media);
+        const fetchData = async () => {
+            try {
+                const response = await fetchFromApi("/media/all-media", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });
+                setData(response.media);
                 setLoading(false);
-            })
-            .catch((error) => {
+            } catch (error) {
                 console.error("Error loading JSON:", error);
                 setLoading(false);
-            });
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Failed to load media data.",
+                    zindex: 1000,
+                });
+            }
+        };
+        fetchData();
     }, []);
     
     /**
@@ -60,15 +68,12 @@ const AllMediaPage = () => {
      */
     const handleDelete = async (rowData) => {
         try {
-            const response = await fetch(`http://localhost:3000/media/delete-media/${rowData.id}`, {
+            await fetchFromApi(`/media/delete-media/${rowData.id}`, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`,
                 },
             });
-            if (!response.ok) {
-                throw new Error("Failed to delete the post.");
-            }
             setData(data.filter((item) => item.id !== rowData.id));
             toast.current.show({
                 severity: "success",
@@ -77,7 +82,6 @@ const AllMediaPage = () => {
                 zindex: 1000,
             });
         } catch (error) {
-            console.error("Error deleting post:", error);
             toast.current.show({
                 severity: "error",
                 summary: "Error",

@@ -10,7 +10,7 @@ const MediaLibraryModal = ({ visible, onHide, onSelect, multiSelect = false, sel
     const [mediaFiles, setMediaFiles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [globalFilter, setGlobalFilter] = useState("");
-    const [selectedMediaState, setSelectedMediaState] = useState(selectedMedia);
+    const [selectedMediaState, setSelectedMediaState] = useState(multiSelect ? [] : null);
 
     useEffect(() => {
         const fetchMediaFiles = async () => {
@@ -37,22 +37,35 @@ const MediaLibraryModal = ({ visible, onHide, onSelect, multiSelect = false, sel
     }, []);
 
     useEffect(() => {
-        const preSelectedMedia = mediaFiles.filter((media) =>
-            selectedMedia.includes(media.id)
-        );
-
-        // Only update state if it has changed
-        if (JSON.stringify(preSelectedMedia) !== JSON.stringify(selectedMediaState)) {
-            setSelectedMediaState(preSelectedMedia);
+        if (multiSelect) {
+            const preSelectedMedia = mediaFiles.filter((media) =>
+                selectedMedia.includes(media.id)
+            );
+            setSelectedMediaState(preSelectedMedia); // array
+        } else {
+            const preSelectedMedia = mediaFiles.find((media) =>
+                media.id === selectedMedia[0]
+            );
+            setSelectedMediaState(preSelectedMedia || null); // object
         }
-    }, [selectedMedia, mediaFiles, selectedMediaState]);
+    }, [multiSelect, selectedMedia, mediaFiles]);
+
 
     const handleConfirmSelection = () => {
+        console.log("Selected Media:", selectedMediaState);
         if (multiSelect) {
+            if (selectedMediaState.length === 0) {
+                console.error("No media selected!");
+                return;
+            }
             const selectedMediaIds = selectedMediaState.map((media) => media.id);
             onSelect(selectedMediaIds);
         } else {
-            onSelect(selectedMediaState?.id);
+            if (!selectedMediaState) {
+                console.error("No media selected!");
+                return;
+            }
+            onSelect(selectedMediaState.id);
         }
         onHide();
     };
@@ -87,7 +100,14 @@ const MediaLibraryModal = ({ visible, onHide, onSelect, multiSelect = false, sel
                         rows={5}
                         globalFilter={globalFilter}
                         selection={selectedMediaState}
-                        onSelectionChange={(e) => setSelectedMediaState(e.value)}
+                        onSelectionChange={(e) => {
+                            console.log("Selection Change Event:", e.value);
+                            if (multiSelect) {
+                                setSelectedMediaState(e.value);
+                            } else {
+                                setSelectedMediaState(e.value);
+                            }
+                        }}
                         selectionMode={multiSelect ? "checkbox" : "single"}
                     >
                         {multiSelect && <Column selectionMode="multiple" headerStyle={{ width: "3em" }} />}
@@ -110,6 +130,23 @@ const MediaLibraryModal = ({ visible, onHide, onSelect, multiSelect = false, sel
                         />
                         <Column field="filename" header="Filename" />
                         <Column field="altText" header="Alt Text" />
+
+                        {!multiSelect && (
+                            <Column
+                                header="Action"
+                                body={(rowData) => (
+                                    <Button
+                                        label="Select"
+                                        icon="pi pi-check"
+                                        className="p-button-sm p-button-primary"
+                                        onClick={() => {
+                                            setSelectedMediaState(rowData);
+                                            handleConfirmSelection();
+                                        }}
+                                    />
+                                )}
+                            />
+                        )}
                     </DataTable>
                     {multiSelect && (
                         <div className="mt-3 flex justify-content-end">

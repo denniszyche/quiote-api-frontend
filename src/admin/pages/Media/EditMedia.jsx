@@ -4,6 +4,7 @@ import Spinner from "../../components/Spinner";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
+import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const EditMediaPage = () => {
     const { id } = useParams();
@@ -22,28 +23,20 @@ const EditMediaPage = () => {
     useEffect(() => {
         const fetchMedia = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/media/${id}`, {
+                const response = await fetchFromApi(`/media/${id}`, {
                     method: "GET",
                     headers: {
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                        
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
                     }
                 });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(
-                        errorData.message || "An unexpected error occurred."
-                    );
-                }
-                const data = await response.json();
                 setFormData({
-                    filename: data.media.filename,
-                    filepath: data.media.filepath,
-                    caption: data.media.caption,
-                    altText: data.media.altText,
-                    size: data.media.size,
-                    user: data.media.user,
-                    mimetype: data.media.mimetype,
+                    filename: response.media.filename,
+                    filepath: response.media.filepath,
+                    caption: response.media.caption,
+                    altText: response.media.altText,
+                    size: response.media.size,
+                    user: response.media.user,
+                    mimetype: response.media.mimetype,
                 });
                 setLoading(false);
             } catch (error) {
@@ -78,7 +71,7 @@ const EditMediaPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`http://localhost:3000/media/update-media/${id}`, {
+            await fetchFromApi(`/media/update-media/${id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -86,12 +79,6 @@ const EditMediaPage = () => {
                 },
                 body: JSON.stringify(formData),
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                    errorData.message || "An unexpected error occurred."
-                );
-            }
             toast.current.show({
                 severity: "success",
                 summary: "Success",

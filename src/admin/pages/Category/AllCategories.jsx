@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUserRoles } from "../../utils/auth.js";
+import { getUserRoles } from "../../../utils/auth.js";
 import Spinner from "../../components/Spinner";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -8,6 +8,7 @@ import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { Toast } from "primereact/toast";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const AllCategories = () => {
     const [data, setData] = useState([]);
@@ -31,16 +32,13 @@ const AllCategories = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://localhost:3000/category/all-categories", {
+                const response = await fetchFromApi("/category/all-categories", {
+                    method: "GET",
                     headers: {
                         "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                    },
+                    }
                 });
-                if (!response.ok) {
-                    throw new Error("Failed to fetch data.");
-                }
-                const result = await response.json();
-                setData(result.categories || []);   
+                setData(response.categories || []);   
             } catch (error) {
                 console.error("Error fetching data:", error);
                 toast.current.show({
@@ -68,15 +66,12 @@ const AllCategories = () => {
      */
     const handleDelete = async (rowData) => {
         try {
-            const response = await fetch(`http://localhost:3000/category/delete-category/${rowData.id}`, {
+            const response = await fetchFromApi(`/category/delete-category/${rowData.id}`, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`,
                 },
             });
-            if (!response.ok) {
-                throw new Error("Failed to delete the post.");
-            }
             setData(data.filter((item) => item.id !== rowData.id));
             toast.current.show({
                 severity: "success",

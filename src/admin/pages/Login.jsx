@@ -5,6 +5,7 @@ import { Password } from 'primereact/password';
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Divider } from "primereact/divider";
+import {fetchFromApi}  from "../../utils/fetchFromApi.js";
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -48,18 +49,14 @@ const Login = () => {
             return;
         }
         try {
-            const response = await fetch("http://localhost:3000/auth/login", {
+            const response = await fetchFromApi("/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(formData),
             });
-            if (!response.ok) {
-                throw new Error("Login failed");
-            }
-            const data = await response.json();
-            localStorage.setItem("token", data.token);
+            localStorage.setItem("token", response.token);
             navigate("/dashboard", { replace: true });
         }
         catch (error) {

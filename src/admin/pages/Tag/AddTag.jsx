@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { getUserRoles } from "../../utils/auth.js";
+import { getUserRoles } from "../../../utils/auth.js";
 import Spinner from "../../components/Spinner";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { useNavigate } from "react-router-dom";
+import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const AddTagPage = () => {
     const [formData, setFormData] = useState({
@@ -57,7 +58,7 @@ const AddTagPage = () => {
             return;
         }
         try {
-            const response = await fetch("http://localhost:3000/tag/create-tag", {
+            await fetchFromApi("/tag/create-tag", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -65,12 +66,6 @@ const AddTagPage = () => {
                 },
                 body: JSON.stringify(formData),
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                    errorData.message || "An unexpected error occurred."
-                );
-            }
             toast.current.show({
                 severity: "success",
                 summary: "Success",

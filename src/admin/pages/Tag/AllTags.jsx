@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUserRoles } from "../../utils/auth.js";
+import { getUserRoles } from "../../../utils/auth.js";
 import Spinner from "../../components/Spinner";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -8,6 +8,7 @@ import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { Toast } from "primereact/toast";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const AllTagsPage = () => {
     const [data, setData] = useState([]);
@@ -31,17 +32,12 @@ const AllTagsPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://localhost:3000/tag/all-tags", {
+                const response = await fetchFromApi("/tag/all-tags", {
                     headers: {
                         "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                    },
+                    }
                 });
-                if (!response.ok) {
-                    throw new Error("Failed to fetch data.");
-                }
-                const result = await response.json();
-                console.log(result);
-                setData(result.tags || []);   
+                setData(response.tags || []);   
             } catch (error) {
                 console.error("Error fetching data:", error);
                 toast.current.show({
@@ -69,15 +65,12 @@ const AllTagsPage = () => {
      */
     const handleDelete = async (rowData) => {
         try {
-            const response = await fetch(`http://localhost:3000/tag/delete-tag/${rowData.id}`, {
+            await fetchFromApi(`/tag/delete-tag/${rowData.id}`, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                },
+                }
             });
-            if (!response.ok) {
-                throw new Error("Failed to delete the post.");
-            }
             setData(data.filter((item) => item.id !== rowData.id));
             toast.current.show({
                 severity: "success",

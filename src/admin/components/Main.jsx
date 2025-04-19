@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {jwtDecode} from "jwt-decode";
 import classNames from "classnames";
+import {fetchFromApi}  from "../../utils/fetchFromApi.js";
 
 const Main = ({shouldShowSidebar, isMobile, children }) => {
     const token = localStorage.getItem("token");
@@ -19,24 +20,17 @@ const Main = ({shouldShowSidebar, isMobile, children }) => {
         const decodedToken = jwtDecode(token);
         const userId = decodedToken.userId;
         useEffect(() => {
-            const documentStyle = getComputedStyle(document.documentElement);
             const fetchUser = async () => {
                 try {
-                    const response = await fetch(`http://localhost:3000/user/post/${userId}`, 
-                        {
-                            method: "GET",
-                            headers: {
-                                "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                            },
-                        }
-                    );
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch absence");
-                    }
-                    const data = await response.json();
+                    const response = await fetchFromApi(`/user/${userId}`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    });
                     setUserData({
-                        first_name: data.user.first_name,
-                        last_name: data.user.last_name,
+                        first_name: response.user.first_name,
+                        last_name: response.user.last_name,
                     });
                 }
                 catch (error) {

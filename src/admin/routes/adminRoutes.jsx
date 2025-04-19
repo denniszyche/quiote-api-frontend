@@ -23,6 +23,7 @@ const EditMediaPage = lazy(() => import("../pages/Media/EditMedia"));
 const AllTagsPage = lazy(() => import("../pages/Tag/AllTags"));
 const AddTagPage = lazy(() => import("../pages/Tag/AddTag"));
 const EditTagPage = lazy(() => import("../pages/Tag/EditTag"));
+const AllSettingsPage = lazy(() => import("../pages/Settings/AllSettings"));
 
 const adminRoutes = [
     {
@@ -206,6 +207,16 @@ const adminRoutes = [
                     <ProtectedRoute>
                         <Suspense fallback={<Spinner />}>
                             <EditTagPage />
+                        </Suspense>
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: "/all-settings",
+                element: (
+                    <ProtectedRoute>
+                        <Suspense fallback={<Spinner />}>
+                            <AllSettingsPage />
                         </Suspense>
                     </ProtectedRoute>
                 ),

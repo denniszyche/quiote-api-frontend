@@ -1,0 +1,99 @@
+.index{
+    
+    &__posts-list{
+        border: 1px dashed green;
+        list-style: none;
+        padding: 2rem;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(1,minmax(0,1fr));
+        gap: 1rem;
+        @media (min-width: 768px) {
+            grid-template-columns: repeat(2,minmax(0,1fr));
+        }
+        @media (min-width: 1024px) {
+            grid-template-columns: repeat(3,minmax(0,1fr));
+        }
+        @media (min-width: 1280px) {
+            grid-template-columns: repeat(4,minmax(0,1fr));
+        }
+    }
+
+    &__posts-list-item{
+        background-color: pink;
+    }
+
+    &__posts-list-item--featured{
+        grid-column: span 1/span 1;
+        border: 1px dashed green;
+        @media (min-width: 768px) {
+            grid-column: span 2/span 2;
+        }
+    }
+
+    &__posts-list-item--featured-link{
+        position: relative;
+        border-radius: 1rem;
+        text-decoration: none;
+        color: black;
+        overflow: hidden;
+        transition: all .2s ease-in-out;
+        display: grid;
+        grid-template-columns: repeat(1,minmax(0,1fr));
+        
+        @media screen and (min-width: 768px) {
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            
+        }
+        &:hover,
+        &:focus{
+            background-color: var(--accent-yellow);
+        }
+
+    }
+
+    &__posts-list-item--featured-header{
+        padding: 2rem;
+    }
+    
+    &__posts-list-item--featured-image{
+        position: relative;
+        overflow: hidden;
+        height: 40rem;
+        border-radius: 1rem;
+    }
+
+    &__posts-list-item--featured-category{
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+
+        .circle{
+            margin-right: 1rem;
+        }
+    }
+
+    &__posts-list-item--featured-title{
+        margin-bottom: 2rem;
+        h3{
+            font-size: 32px;
+            line-height: 1;
+            color: var(--color-black);
+            transition: all .2s ease-in-out;
+            letter-spacing: -0.03em;
+            font-weight: 500;
+        }
+    }
+
+    &__posts-list-item--featured-category,
+    &__posts-list-item--featured-excerpt{
+        span,
+        p{
+            font-size: 1.6rem;
+            font-weight: 400;
+            line-height: 1.4;
+            letter-spacing: -0.02em;
+        }
+    }
+
+}

@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUserRoles } from "../../utils/auth.js";
+import { getUserRoles } from "../../../utils/auth.js";
 import Spinner from "../../components/Spinner";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { FileUpload } from 'primereact/fileupload';
-
+import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const AddMediaPage = () => {
     const [formData, setFormData] = useState({
@@ -74,19 +74,13 @@ const AddMediaPage = () => {
             formDataToSend.append("caption", formData.caption);
             formDataToSend.append("altText", formData.altText);
             formDataToSend.append("filename", formData.filename);
-            const response = await fetch("http://localhost:3000/media/create-media", {
+            await fetchFromApi("/media/create-media", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`,
                 },
                 body: formDataToSend,
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                    errorData.message || "An unexpected error occurred."
-                );
-            }
             toast.current.show({
                 severity: "success",
                 summary: "Success",
@@ -96,7 +90,6 @@ const AddMediaPage = () => {
                 navigate("/all-media");
             }, 1500);
         } catch (error) {
-            console.error("Error:", error);
             toast.current.show({
                 severity: "error",
                 summary: "Error",
@@ -122,7 +115,7 @@ const AddMediaPage = () => {
                         ref={fileUploadRef} 
                         name="media"
                         accept="image/*"
-                        maxFileSize={1000000}
+                        maxFileSize={2000000}
                         mode="basic"
                         auto
                         customUpload

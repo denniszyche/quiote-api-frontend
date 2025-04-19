@@ -11,6 +11,7 @@ import { Checkbox } from "primereact/checkbox";
 import { InputSwitch } from 'primereact/inputswitch';
 import { Image } from 'primereact/image';
 import ContentEditor from "../../components/ContentEditor";
+import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const AddPostPage = () => {
     const [formData, setFormData] = useState({
@@ -23,11 +24,20 @@ const AddPostPage = () => {
         galleryImageUrls: [],
         featured: false,
         status: "draft",
+        post_type: "view",
         categories: [],
         tags: [],
         translations: [
-            { language: "en", title: "", excerpt: "", content: "", details: {} },
-            { language: "es", title: "", excerpt: "", content: "", details: {} },
+            { language: "en", title: "", excerpt: "", content: "", details: {
+                city: "",
+                country: "",
+                status: ""
+            } },
+            { language: "es", title: "", excerpt: "", content: "", details: {
+                city: "",
+                country: "",
+                status: ""
+            } },
         ],
     });
     const [categories, setCategories] = useState([]);
@@ -41,21 +51,16 @@ const AddPostPage = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await fetch(
-                    "http://localhost:3000/category/all-categories",
+                const response = await fetchFromApi(
+                    "/category/all-categories",
                     {
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${localStorage.getItem("token")}`,
                         },
                     }
-
                 );
-                if (!response.ok) {
-                    throw new Error("Failed to fetch categories.");
-                }
-                const data = await response.json();
-                setCategories(data.categories);
+                setCategories(response.categories);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching categories:", error);
@@ -72,21 +77,16 @@ const AddPostPage = () => {
     useEffect(() => {
         const fetchTags = async () => {
             try {
-                const response = await fetch(
-                    "http://localhost:3000/tag/all-tags",
+                const response = await fetchFromApi(
+                    "/tag/all-tags",
                     {
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${localStorage.getItem("token")}`,
                         },
                     }
-
                 );
-                if (!response.ok) {
-                    throw new Error("Failed to fetch tags.");
-                }
-                const data = await response.json();
-                setTags(data.tags);
+                setTags(response.tags);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching tags:", error);
@@ -234,20 +234,26 @@ const AddPostPage = () => {
             return;
         }
         try {
-            const response = await fetch("http://localhost:3000/post/create-post", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                    errorData.message || "An unexpected error occurred."
-                );
-            }
+            // const response = await fetch("http://localhost:3000/post/create-post", {
+            //     method: "POST",
+            //     headers: {
+            //         "Authorization": `Bearer ${localStorage.getItem("token")}`,
+            //         "Content-Type": "application/json",
+            //     },
+            //     body: JSON.stringify(formData),
+            // });
+
+            const response = await fetchFromApi(
+                "/post/create-post",
+                {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                }
+            );  
             toast.current.show({
                 severity: "success",
                 summary: "Success",
@@ -366,6 +372,23 @@ const AddPostPage = () => {
                                 className="w-full mb-3"
                             />
                             <label 
+                                htmlFor="status"
+                                className="text-secondary font-semibold block mb-3">
+                                Post Type</label>
+                            <Dropdown
+                                id="post_type"
+                                name="post_type"
+                                value={formData.post_type}
+                                options={[
+                                    { label: "View", value: "view" },
+                                    { label: "Link", value: "link" },
+                                    { label: "Plain", value: "plain" },
+                                ]}
+                                onChange={handleChange}
+                                placeholder="Select a status"
+                                className="w-full mb-3"
+                            />
+                            <label 
                                 htmlFor="featured"
                                 className="text-secondary font-semibold block mb-3">
                                 Featured</label>                        
@@ -379,6 +402,34 @@ const AddPostPage = () => {
                             <div className="flex justify-content-end">
                                 <Button type="submit" label="Save" />
                             </div>
+                        </div>
+                        <div className="card width-shadow w-100 mb-3">
+                            <label 
+                                htmlFor="featuredImage"
+                                className="text-secondary font-semibold block mb-3">
+                                Featured Image</label>
+                                <Button
+                                    label="Select Image"
+                                    icon="pi pi-image"
+                                    onClick={() => setIsMediaLibraryVisible(true)}
+                                    className="p-button-sm"
+                                    type="button"
+                                />
+                                {formData.featuredImageUrl  && (
+                                    <div className="mt-3">
+                                        <Image 
+                                            src={formData.featuredImageUrl}
+                                            zoomSrc={formData.featuredImageUrl}
+                                            width="100" 
+                                            height="100" 
+                                            preview
+                                            style={{
+                                                objectFit: "cover",
+                                                backgroundColor: "#f0f0f0",
+                                            }}
+                                        />
+                                    </div>
+                                )}
                         </div>
                         <div className="card width-shadow w-100 mb-3">
                             <h4>Categories</h4>
@@ -423,37 +474,46 @@ const AddPostPage = () => {
                             ))}
                         </div>
                         <div className="card width-shadow w-100 mb-3">
-                            <label 
-                                htmlFor="featuredImage"
-                                className="text-secondary font-semibold block mb-3">
-                                Featured Image</label>
-                                <Button
-                                    label="Select Image"
-                                    icon="pi pi-image"
-                                    onClick={() => setIsMediaLibraryVisible(true)}
-                                    className="p-button-sm"
-                                    type="button"
-                                />
-                                {formData.featuredImageUrl  && (
-                                    <div className="mt-3">
-                                        <Image 
-                                            src={formData.featuredImageUrl}
-                                            zoomSrc={formData.featuredImageUrl}
-                                            width="100" 
-                                            height="100" 
-                                            preview
-                                            style={{
-                                                objectFit: "cover",
-                                                backgroundColor: "#f0f0f0",
-                                            }}
-                                        />
-                                    </div>
-                                )}
+                            <h4>Details</h4>
+                            {formData.translations.map((translation, index) => (
+                                <div key={index} className="mb-4">
+                                    <label htmlFor={`city-${translation.language}`} className="text-secondary font-semibold block mb-3">
+                                        City ({translation.language})
+                                    </label>
+                                    <InputText
+                                        id={`city-${translation.language}`}
+                                        name="city"
+                                        value={translation.details.city}
+                                        onChange={(e) => handleTranslationChange(index, "details", { ...translation.details, city: e.target.value })}
+                                        className="w-full mb-3"
+                                    />
+                                    <label htmlFor={`country-${translation.language}`} className="text-secondary font-semibold block mb-3">
+                                        Country ({translation.language})
+                                    </label>
+                                    <InputText
+                                        id={`country-${translation.language}`}
+                                        name="country"
+                                        value={translation.details.country}
+                                        onChange={(e) => handleTranslationChange(index, "details", { ...translation.details, country: e.target.value })}
+                                        className="w-full mb-3"
+                                    />
+                                    <label htmlFor={`status-${translation.language}`} className="text-secondary font-semibold block mb-3">
+                                        Status ({translation.language})
+                                    </label>
+                                    <InputText
+                                        id={`status-${translation.language}`}
+                                        name="status"
+                                        value={translation.details.status}
+                                        onChange={(e) => handleTranslationChange(index, "details", { ...translation.details, status: e.target.value })}
+                                        className="w-full mb-3"
+                                    />
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
             </form>
-            <MediaLibraryModal
+            {/* <MediaLibraryModal
                 visible={isMediaLibraryVisible}
                 onHide={() => setIsMediaLibraryVisible(false)}
                 onSelect={handleFeaturedMediaSelect}
@@ -464,7 +524,7 @@ const AddPostPage = () => {
                 onHide={() => setIsMediaLibraryGalleryVisible(false)}
                 onSelect={handleGalleryMediaSelect}
                 multiSelect={true}
-            />
+            /> */}
         </>
     );
 };

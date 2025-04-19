@@ -24,6 +24,17 @@ const AdminRoot = () => {
     }, []);
 
 
+    useEffect(() => {
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = "/src/admin-style.css";
+        document.head.appendChild(link);
+        return () => {
+            document.head.removeChild(link);
+        };
+    }, []);
+
+
 
     return (
         <div className="admin-page-content">

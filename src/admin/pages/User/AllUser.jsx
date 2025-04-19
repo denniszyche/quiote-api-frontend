@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUserRoles } from "../../utils/auth.js";
+import { getUserRoles } from "../../../utils/auth.js";
 import Spinner from "../../components/Spinner";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -9,6 +9,7 @@ import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { Toast } from "primereact/toast";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const AllUserPage = () => {
     const [users, setUserData] = useState([]);
@@ -29,21 +30,21 @@ const AllUserPage = () => {
         checkAccess();
     }, [navigate]);
 
-
     useEffect(() => {
-        fetch("http://localhost:3000/user/all-users", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem("token")}`,
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                setUserData(data.users);
-            })
-            .catch((error) => {
+        const fetchData = async () => {
+            try {
+                const response = await fetchFromApi("/user/all-users", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });
+                setUserData(response.users);
+            } catch (error) {
                 console.error("Error loading JSON:", error);
-            });
+            }
+        };
+        fetchData();
     }, []);
 
     /**
@@ -90,17 +91,13 @@ const AllUserPage = () => {
      * @param {*} rowData
      */
     const handleDelete = async (rowData) => {
-        console.log("Deleting user with ID:", rowData.id);
         try {
-            const response = await fetch(`http://localhost:3000/user/post/${rowData.id}`, {
+            const response = await fetchFromApi(`/user/delete-user/${rowData.id}`, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`,
                 },
             });
-            if (!response.ok) {
-                throw new Error("Failed to delete the user.");
-            }
             setUserData(users.filter((item) => item.id !== rowData.id));
             toast.current.show({
                 severity: "success",
@@ -173,6 +170,12 @@ const AllUserPage = () => {
     return (
         <div className="card width-shadow w-100">
             <h4>All User</h4>
+            <Button
+                label="Add User"
+                icon="pi pi-plus"
+                className="p-button-success mb-3"
+                onClick={() => navigate("/add-user")}
+            />
             <Toast ref={toast} />
             <ConfirmDialog />
             <DataTable value={users}>

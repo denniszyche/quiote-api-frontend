@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getUserRoles } from "../../utils/auth.js";
+import { getUserRoles } from "../../../utils/auth.js";
 import Spinner from "../../components/Spinner";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
+import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const EditUser = () => {
     const { id } = useParams();
@@ -37,23 +38,17 @@ const EditUser = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/user/post/${id}`, 
-                    {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                        },
-                    }
-                );
-                if (!response.ok) {
-                    throw new Error("Failed to fetch absence");
-                }
-                const data = await response.json();
+                const response = await fetchFromApi(`/user/${id}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });
                 setFormData({
-                    first_name: data.user.first_name,
-                    last_name: data.user.last_name,
-                    email: data.user.email,
-                    roles: data.user.roles[0]?.id || null,
+                    first_name: response.user.first_name,
+                    last_name: response.user.last_name,
+                    email: response.user.email,
+                    roles: response.user.roles[0]?.id || null,
                 });
             } catch (err) {
                 setError(err.message);
@@ -67,20 +62,17 @@ const EditUser = () => {
     useEffect(() => {
         const fetchRoles = async () => {
             try {
-                const response = await fetch(
-                    "http://localhost:3000/user/roles",
+                const response = await fetchFromApi(
+                    "/user/roles",
                     {
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                        },
+                        }
                     }
                 );
-                if (!response.ok) {
-                    throw new Error("Failed to fetch user roles.");
-                }
-                const data = await response.json();
-                const formattedRoles = data.roles.map((role) => ({
+
+                const formattedRoles = response.roles.map((role) => ({
                     name: role.name,
                     value: role.id,
                 }));
@@ -132,28 +124,22 @@ const EditUser = () => {
             return;
         }
         try {
-            const response = await fetch(`http://localhost:3000/user/post/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                },
-                body: JSON.stringify(formData),
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                    errorData.message || "An unexpected error occurred."
-                );
-            }
+            const response = await fetchFromApi(
+                `/user/update-user/${id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    },
+                    body: JSON.stringify(formData),
+                }
+            );
             toast.current.show({
                 severity: "success",
                 summary: "Success",
                 detail: "Benutzer*in erfolgreich aktualisiert",
             });
-            setTimeout(() => {
-                navigate("/all-user");
-            }, 1500);
         } catch (error) {
             console.error("Error:", error);
             toast.current.show({

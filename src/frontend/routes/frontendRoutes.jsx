@@ -4,6 +4,8 @@ import Spinner from "../../admin/components/Spinner";
 import FrontendRoot from "../pages/FrontendRoot";
 const HomePage = lazy(() => import("../pages/Home"));
 
+import LanguageProvider from "../components/LanguageContext";
+
 const frontendRoutes = [
     {
         path: "/",
@@ -18,7 +20,9 @@ const frontendRoutes = [
                 index: true,
                 element: (
                     <Suspense fallback={<Spinner />}>
-                        <HomePage />
+                        <LanguageProvider>
+                            <HomePage />
+                        </LanguageProvider>
                     </Suspense>
                 ),
             }

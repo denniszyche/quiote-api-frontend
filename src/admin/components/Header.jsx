@@ -1,6 +1,6 @@
 import { TieredMenu } from 'primereact/tieredmenu';
 import { useNavigate } from 'react-router-dom';
-import { getUserRoles } from "../utils/auth.js";
+import { getUserRoles } from "../../utils/auth.js";
         
 const Header = () => {
     const navigate = useNavigate();
@@ -89,6 +89,18 @@ const Header = () => {
                     label: 'Add Media',
                     command: () => navigate('/add-media')
                 }
+            ]
+        },
+        { separator: true },
+        {
+            label: 'Settings',
+            icon: 'pi pi-cog',
+            items: [
+                {
+                    label: 'All Settings',
+                    command: () => navigate('/all-settings')
+                },
+
             ]
         },
         { separator: true },

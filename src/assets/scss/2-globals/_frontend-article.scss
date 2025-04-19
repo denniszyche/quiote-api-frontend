@@ -1,0 +1,25 @@
+html{
+    font-size: .6944444444444444vw
+}
+    
+body{
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6{
+    margin: 0;
+}
+
+.circle{
+    width: 1.2rem;
+    height: 1.2rem;
+    background-color: var(--color-black);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-block;
+}

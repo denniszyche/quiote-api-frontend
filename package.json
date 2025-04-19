@@ -16,6 +16,7 @@
     "chart.js": "^4.4.8",
     "classnames": "^2.5.1",
     "date-fns": "^4.1.0",
+    "gsap": "npm:@gsap/shockingly@^3.12.7",
     "jwt-decode": "^4.0.0",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",

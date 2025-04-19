@@ -1,10 +1,15 @@
 @import "1-base/fonts";
 @import "1-base/roots";
-@import "2-globals/article";
-@import "3-layout/admin-layout";
-@import "3-layout/form";
-@import "3-layout/table";
-@import "3-layout/card";
-@import "3-layout/spinner";
-@import "3-layout/menu";
-@import "3-layout/dialog";
+// @import "2-globals/admin-article";
+// @import "3-layout/admin-layout";
+// @import "3-layout/form";
+// @import "3-layout/table";
+// @import "3-layout/card";
+// @import "3-layout/spinner";
+// @import "3-layout/menu";
+// @import "3-layout/dialog";
+
+
+@import "3-layout/frontend-layout";
+@import "2-globals/frontend-article";
+@import "3-layout/index";

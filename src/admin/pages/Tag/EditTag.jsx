@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getUserRoles } from "../../utils/auth.js";
+import { getUserRoles } from "../../../utils/auth.js";
 import Spinner from "../../components/Spinner";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
+import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const EditTagPage = () => {
     const { id } = useParams();
@@ -34,22 +35,14 @@ const EditTagPage = () => {
     useEffect(() => {
         const fetchTag = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/tag/${id}`, {
-                    method: "GET",
+                const response = await fetchFromApi(`/tag/${id}`, {
                     headers: {
                         "Authorization": `Bearer ${localStorage.getItem("token")}`,
                     }
                 });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(
-                        errorData.message || "An unexpected error occurred."
-                    );
-                }
-                const data = await response.json();
                 setFormData({
                     ...formData,
-                    translations: data.tag.translations
+                    translations: response.tag.translations
                         .map((translation) => ({
                         name: translation.name,
                         language: translation.language,
@@ -93,7 +86,7 @@ const EditTagPage = () => {
             return;
         }
         try {
-            const response = await fetch(`http://localhost:3000/tag/update-tag/${id}`, {
+            await fetchFromApi(`/tag/update-tag/${id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -101,12 +94,6 @@ const EditTagPage = () => {
                 },
                 body: JSON.stringify(formData),
             });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                    errorData.message || "An unexpected error occurred."
-                );
-            }
             toast.current.show({
                 severity: "success",
                 summary: "Success",
