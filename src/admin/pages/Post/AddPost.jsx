@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Spinner";
 import MediaLibraryModal from "../../components/MediaLibraryModal";
+import MediaLibraryModalSingle from "../../components/MediaLibraryModalSingle";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
@@ -23,7 +24,7 @@ const AddPostPage = () => {
         galleryImageIds: [],
         galleryImageUrls: [],
         featured: false,
-        status: "draft",
+        status: "published",
         post_type: "view",
         categories: [],
         tags: [],
@@ -100,37 +101,16 @@ const AddPostPage = () => {
         fetchTags();
     }, []);
     
-
     /**
      * Handle the media library modal
      * @param {*} e
      */
-    const handleFeaturedMediaSelect = async (imageId) => {
-        try {
-            const response = await fetch(`http://localhost:3000/media/${imageId}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
-            if (!response.ok) {
-                throw new Error("Failed to fetch image details.");
-            }
-            const data = await response.json();
-            console.log("Image data:", data);
-            setFormData({
-                ...formData,
-                featuredImageId: imageId,
-                featuredImageUrl: `http://localhost:3000/${data.media.filepath}`,
-            });
-        } catch (error) {
-            console.error("Error fetching image details:", error);
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: "Failed to fetch image details.",
-            });
-        }
+    const handleFeaturedMediaSelect = async (image) => {
+        setFormData({
+            ...formData,
+            featuredImageId: image.id,
+            featuredImageUrl: `https://quiote-api.dztestserver.de/${image.filepath}`,
+        });
     };
 
     /**
@@ -138,20 +118,20 @@ const AddPostPage = () => {
      * @param {*} imageIds
      */
     const handleGalleryMediaSelect = async (imageIds) => {
+        console.log("Selected image IDs:", imageIds);
         try {
             const imageUrls = await Promise.all(
                 imageIds.map(async (imageId) => {
-                    const response = await fetch(`http://localhost:3000/media/${imageId}`, {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                        },
-                    });
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch image details.");
-                    }
-                    const data = await response.json();
-                    return `http://localhost:3000/${data.media.filepath}`;
+                    const response = await fetchFromApi(
+                        `/media/${imageId}`,
+                        {
+                            method: "GET",
+                            headers: {
+                                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                            },
+                        }
+                    );
+                    return `https://quiote-api.dztestserver.de/${response.media.filepath}`;
                 })
             );
             setFormData({
@@ -160,7 +140,6 @@ const AddPostPage = () => {
                 galleryImageUrls: imageUrls,
             });
         } catch (error) {
-            console.error("Error fetching image details:", error);
             toast.current.show({
                 severity: "error",
                 summary: "Error",
@@ -234,16 +213,7 @@ const AddPostPage = () => {
             return;
         }
         try {
-            // const response = await fetch("http://localhost:3000/post/create-post", {
-            //     method: "POST",
-            //     headers: {
-            //         "Authorization": `Bearer ${localStorage.getItem("token")}`,
-            //         "Content-Type": "application/json",
-            //     },
-            //     body: JSON.stringify(formData),
-            // });
-
-            const response = await fetchFromApi(
+            await fetchFromApi(
                 "/post/create-post",
                 {
                     method: "POST",
@@ -411,7 +381,9 @@ const AddPostPage = () => {
                                 <Button
                                     label="Select Image"
                                     icon="pi pi-image"
-                                    onClick={() => setIsMediaLibraryVisible(true)}
+                                    onClick={() => {
+                                        setIsMediaLibraryVisible(true);
+                                    }}
                                     className="p-button-sm"
                                     type="button"
                                 />
@@ -513,18 +485,16 @@ const AddPostPage = () => {
                     </div>
                 </div>
             </form>
-            {/* <MediaLibraryModal
-                visible={isMediaLibraryVisible}
-                onHide={() => setIsMediaLibraryVisible(false)}
-                onSelect={handleFeaturedMediaSelect}
-                multiSelect={false}
-            />
             <MediaLibraryModal
                 visible={isMediaLibraryGalleryVisible}
                 onHide={() => setIsMediaLibraryGalleryVisible(false)}
                 onSelect={handleGalleryMediaSelect}
-                multiSelect={true}
-            /> */}
+            /> 
+            <MediaLibraryModalSingle
+                visible={isMediaLibraryVisible}
+                onHide={() => setIsMediaLibraryVisible(false)}
+                onSelect={handleFeaturedMediaSelect}
+            />
         </>
     );
 };

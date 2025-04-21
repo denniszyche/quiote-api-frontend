@@ -114,7 +114,7 @@ const Header = () => {
     return (
         <header className="admin-page-content__header">
             <div className="admin-page-content__header-logo">
-                <a href="/dashboard" className="page-content__header-logo-link">
+                <a href="/" className="page-content__header-logo-link">
                     <img src="/images/cms-logo.svg" alt="Logo" />
                 </a>
             </div>

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Spinner from "../../components/Spinner";
 import MediaLibraryModal from "../../components/MediaLibraryModal";
+import MediaLibraryModalSingle from "../../components/MediaLibraryModalSingle";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
@@ -51,8 +52,6 @@ const EditPostPage = () => {
 
     useEffect(() => {
         const fetchPost = async () => {
-
-            console.log("Fetching post data...");
             try {
                 const response = await fetchFromApi(`/post/${id}`, {
                     method: "GET",
@@ -62,13 +61,13 @@ const EditPostPage = () => {
                 });
                 let featuredImageUrl = "";
                 if (response.post.featuredImageId) {
-                    const imageResponse = await fetchFromApi(`/media/${data.post.featuredImageId}`, {
+                    const imageResponse = await fetchFromApi(`/media/${response.post.featuredImageId}`, {
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${localStorage.getItem("token")}`,
                         },
                     });
-                    featuredImageUrl = `http://localhost:3000/${imageResponse.media.filepath}`;
+                    featuredImageUrl = `https://quiote-api.dztestserver.de/${imageResponse.media.filepath}`;
                 }
                 setFormData({
                     ...formData,
@@ -96,7 +95,7 @@ const EditPostPage = () => {
                 });
 
                 response.post.gallery.forEach((image) => {
-                    const imageUrl = `http://localhost:3000/${image.filepath}`;
+                    const imageUrl = `https://quiote-api.dztestserver.de/${image.filepath}`;
                     setFormData((prevState) => ({
                         ...prevState,
                         galleryImageUrls: [...prevState.galleryImageUrls, imageUrl],
@@ -161,33 +160,12 @@ const EditPostPage = () => {
      * Handle the media library modal
      * @param {*} e
      */
-    const handleFeaturedMediaSelect = async (imageId) => {
-        // try {
-
-        //     const response = await fetchFromApi(`/media/${imageId}`, {
-        //         method: "GET",
-        //         headers: {
-        //             "Authorization": `Bearer ${localStorage.getItem("token")}`,
-        //         },
-        //     });
-        //     if (!response.ok) {
-        //         throw new Error("Failed to fetch image details.");
-        //     }
-        //     const data = await response.json();
-        //     console.log("Image data:", data);
-        //     setFormData({
-        //         ...formData,
-        //         featuredImageId: imageId,
-        //         featuredImageUrl: `http://localhost:3000/${data.media.filepath}`,
-        //     });
-        // } catch (error) {
-        //     console.error("Error fetching image details:", error);
-        //     toast.current.show({
-        //         severity: "error",
-        //         summary: "Error",
-        //         detail: "Failed to fetch image details.",
-        //     });
-        // }
+    const handleFeaturedMediaSelect = async (image) => {
+        setFormData({
+            ...formData,
+            featuredImageId: image.id,
+            featuredImageUrl: `https://quiote-api.dztestserver.de/${image.filepath}`,
+        });
     };
 
     /**
@@ -198,17 +176,13 @@ const EditPostPage = () => {
         try {
             const imageUrls = await Promise.all(
                 imageIds.map(async (imageId) => {
-                    const response = await fetch(`http://localhost:3000/media/${imageId}`, {
+                    const response = await fetchFromApi(`/media/${imageId}`, {
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${localStorage.getItem("token")}`,
                         },
                     });
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch image details.");
-                    }
-                    const data = await response.json();
-                    return `http://localhost:3000/${data.media.filepath}`;
+                    return `https://quiote-api.dztestserver.de/${response.media.filepath}`;
                 })
             );
             setFormData({
@@ -226,9 +200,6 @@ const EditPostPage = () => {
         }
     }
 
-    /**
-     * Handle clear all gallery images
-     */
     const handleClearAllGalleryImages = () => {
         setFormData({
             ...formData,
@@ -236,6 +207,14 @@ const EditPostPage = () => {
             galleryImageIds: [],
         });
     };
+
+    const handleClearFeaturedImage = () => {
+        setFormData({
+            ...formData,
+            featuredImageId: null,
+            featuredImageUrl: "",
+        });
+    }   
 
     /**
      * Handle category change
@@ -307,15 +286,6 @@ const EditPostPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // const response = await fetch(`http://localhost:3000/post/update-post/${id}`, {
-            //     method: "PUT",
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //         "Authorization": `Bearer ${localStorage.getItem("token")}`,
-            //     },
-            //     body: JSON.stringify(formData),
-            // });
-
             await fetchFromApi(`/post/update-post/${id}`, {
                 method: "PUT",
                 headers: {
@@ -516,19 +486,29 @@ const EditPostPage = () => {
                                     type="button"
                                 />
                                 {formData.featuredImageUrl  && (
-                                    <div className="mt-3">
-                                        <Image 
-                                            src={formData.featuredImageUrl}
-                                            zoomSrc={formData.featuredImageUrl}
-                                            width="100" 
-                                            height="100" 
-                                            preview
-                                            style={{
-                                                objectFit: "cover",
-                                                backgroundColor: "#f0f0f0",
-                                            }}
+                                    <>
+                                        <div className="mt-3 mb-3">
+                                            <Image 
+                                                src={formData.featuredImageUrl}
+                                                zoomSrc={formData.featuredImageUrl}
+                                                width="100" 
+                                                height="100" 
+                                                preview
+                                                style={{
+                                                    objectFit: "cover",
+                                                    backgroundColor: "#f0f0f0",
+                                                }}
+                                            />
+
+                                        </div>
+                                        <Button
+                                            label="Clear Image"
+                                            icon="pi pi-trash"
+                                            onClick={handleClearFeaturedImage}
+                                            className="p-button-danger p-button-sm"
+                                            type="button"
                                         />
-                                    </div>
+                                    </>  
                                 )}
                         </div>
                         <div className="card width-shadow w-100 mb-3">
@@ -615,17 +595,14 @@ const EditPostPage = () => {
                 </div>
             </form>
             <MediaLibraryModal
-                visible={isMediaLibraryVisible}
-                onHide={() => setIsMediaLibraryVisible(false)}
-                onSelect={handleFeaturedMediaSelect}
-                multiSelect={false}
-            />
-            <MediaLibraryModal
                 visible={isMediaLibraryGalleryVisible}
                 onHide={() => setIsMediaLibraryGalleryVisible(false)}
                 onSelect={handleGalleryMediaSelect}
-                multiSelect={true}
-                selectedMedia={formData.galleryImageIds} 
+            /> 
+            <MediaLibraryModalSingle
+                visible={isMediaLibraryVisible}
+                onHide={() => setIsMediaLibraryVisible(false)}
+                onSelect={handleFeaturedMediaSelect}
             />
         </>
     );

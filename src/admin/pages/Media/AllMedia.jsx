@@ -160,8 +160,8 @@ const AllMediaPage = () => {
                         header="Thumbnail"
                         body={(rowData) => (
                             <Image 
-                                src={rowData.filepath ? `http://localhost:3000/${rowData.filepath}` : "/images/cms-logo.svg"}
-                                zoomSrc={rowData.filepath ? `http://localhost:3000/${rowData.filepath}` : "/images/cms-logo.svg"}
+                                src={rowData.filepath ? `https://quiote-api.dztestserver.de/${rowData.filepath}` : "/images/cms-logo.svg"}
+                                zoomSrc={rowData.filepath ? `https://quiote-api.dztestserver.de/${rowData.filepath}` : "/images/cms-logo.svg"}
                                 alt={rowData.altText || "Media Thumbnail"} 
                                 width="80" 
                                 height="80" 

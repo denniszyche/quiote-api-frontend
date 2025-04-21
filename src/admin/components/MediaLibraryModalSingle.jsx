@@ -4,13 +4,11 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Image } from "primereact/image";
-import { InputText } from "primereact/inputtext";
 import { fetchFromApi } from "../..//utils/fetchFromApi.js";
 
-const MediaLibraryModal = ({ visible, onHide, onSelect, selectedMedia = [] }) => {
+const MediaLibraryModalSingle = ({ visible, onHide, onSelect}) => {
     const [mediaFiles, setMediaFiles] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [globalFilter, setGlobalFilter] = useState("");
     const [selectedMediaState, setSelectedMediaState] = useState([]);
 
     useEffect(() => {
@@ -32,30 +30,10 @@ const MediaLibraryModal = ({ visible, onHide, onSelect, selectedMedia = [] }) =>
         fetchMediaFiles();
     }, []);
     
-    useEffect(() => {
-        if (mediaFiles.length > 0 && selectedMedia.length > 0) {
-            const preSelectedMedia = mediaFiles.filter((media) =>
-                selectedMedia.includes(media.id)
-            );
-            if (JSON.stringify(preSelectedMedia) !== JSON.stringify(selectedMediaState)) {
-                setSelectedMediaState(preSelectedMedia);
-            }
-        }
-    }, [selectedMedia, mediaFiles]); 
-
-    const handleConfirmSelection = () => {
-        if (selectedMediaState.length === 0) {
-            console.error("No media selected!");
-            return;
-        }
-        const selectedMediaIds = selectedMediaState.map((media) => media.id);
-        onSelect(selectedMediaIds);
-        onHide();
-    };
 
     return (
         <Dialog
-            header={"Select Media for Gallery"}
+            header={"Select Featured Media"}
             visible={visible}
             style={{ width: "50vw" }}
             onHide={onHide}
@@ -66,29 +44,16 @@ const MediaLibraryModal = ({ visible, onHide, onSelect, selectedMedia = [] }) =>
                 <p>No media files found.</p>
             ) : (
                 <>
-                    <div className="mb-3">
-                        <span className="p-input-icon-left">
-                            <i className="pi pi-search" />
-                            <InputText
-                                value={globalFilter}
-                                onChange={(e) => setGlobalFilter(e.target.value)}
-                                placeholder="Search by filename or alt text"
-                                className="w-full"
-                            />
-                        </span>
-                    </div>
                     <DataTable
                         value={mediaFiles}
                         paginator
                         rows={5}
-                        globalFilter={globalFilter}
                         selection={selectedMediaState}
                         onSelectionChange={(e) => {
                             setSelectedMediaState(e.value);
                         }}
-                        selectionMode="multiple"
+                        
                     >
-                        <Column selectionMode="multiple" headerStyle={{ width: "3em" }} />
                         <Column
                             header="Thumbnail"
                             body={(rowData) => (
@@ -108,19 +73,25 @@ const MediaLibraryModal = ({ visible, onHide, onSelect, selectedMedia = [] }) =>
                         />
                         <Column field="filename" header="Filename" />
                         <Column field="altText" header="Alt Text" />
+                        <Column
+                        header="Action"
+                        body={(rowData) => (
+                            <Button
+                                label="Select"
+                                icon="pi pi-check"
+                                className="p-button-success"
+                                onClick={() => {
+                                    onSelect(rowData);
+                                    onHide();
+                                }}
+                            />
+                        )}
+                    />
                     </DataTable>
-                    <div className="mt-3 flex justify-content-end">
-                        <Button
-                            label="Confirm Selection"
-                            icon="pi pi-check"
-                            onClick={handleConfirmSelection}
-                            disabled={selectedMediaState.length === 0}
-                        />
-                    </div>
                 </>
             )}
         </Dialog>
     );
 };
 
-export default MediaLibraryModal;
+export default MediaLibraryModalSingle;
