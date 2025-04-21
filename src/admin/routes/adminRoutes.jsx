@@ -13,7 +13,6 @@ const AllCategoriesPage = lazy(() => import("../pages/Category/AllCategories"));
 const AddCategoryPage = lazy(() => import("../pages/Category/AddCategory"));
 const EditCategoryPage = lazy(() => import("../pages/Category/EditCategory"));
 const DashboardPage = lazy(() => import("../pages/Dashboard"));
-const SignUpPage = lazy(() => import("../pages/SignUp"));
 const AllUserPage = lazy(() => import("../pages/User/AllUser"));
 const AddUserPage = lazy(() => import("../pages/User/AddUser"));
 const EditUserPage = lazy(() => import("../pages/User/EditUser"));
@@ -40,14 +39,6 @@ const adminRoutes = [
                 element: (
                     <Suspense fallback={<Spinner />}>
                         <LoginPage />
-                    </Suspense>
-                ),
-            },
-            {
-                path: "/sign-up",
-                element: (
-                    <Suspense fallback={<Spinner />}>
-                        <SignUpPage />
                     </Suspense>
                 ),
             },

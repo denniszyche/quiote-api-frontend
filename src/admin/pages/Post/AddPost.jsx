@@ -90,7 +90,6 @@ const AddPostPage = () => {
                 setTags(response.tags);
                 setLoading(false);
             } catch (error) {
-                console.error("Error fetching tags:", error);
                 toast.current.show({
                     severity: "error",
                     summary: "Error",
@@ -417,7 +416,8 @@ const AddPostPage = () => {
                                     <label htmlFor={category.id} className="ml-2">
                                         {category.translations.map((translation, index) => (
                                             <span key={index} className="mr-2">
-                                                {translation.name} ({translation.language.toUpperCase()})
+                                                {translation.name}
+                                                {index === 0 && " /"}
                                             </span>
                                         ))}
                                     </label>
@@ -438,7 +438,8 @@ const AddPostPage = () => {
                                     <label htmlFor={tag.id} className="ml-2">
                                         {tag.translations.map((translation, index) => (
                                             <span key={index} className="mr-2">
-                                                {translation.name} ({translation.language.toUpperCase()})
+                                                {translation.name}
+                                                {index === 0 && " /"}
                                             </span>
                                         ))}
                                     </label>

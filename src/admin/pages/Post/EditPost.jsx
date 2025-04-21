@@ -69,6 +69,8 @@ const EditPostPage = () => {
                     });
                     featuredImageUrl = `https://quiote-api.dztestserver.de/${imageResponse.media.filepath}`;
                 }
+
+                console.log("Post data:", response.post.tags);
                 setFormData({
                     ...formData,
                     featuredImageId: response.post.featuredImageId,
@@ -144,7 +146,6 @@ const EditPostPage = () => {
                 });
                 setTags(response.tags);
             } catch (error) {
-                console.error("Error tags categories:", error);
                 toast.current.show({
                     severity: "error",
                     summary: "Error",
@@ -229,18 +230,17 @@ const EditPostPage = () => {
         }
         setFormData({ ...formData, categories: _selectedCategories });
     };
-
+    
     /**
      * Handle tag change
      * @param {*} e
      */
     const onTagChange = (e) => {
         let _selectedTags = [...formData.tags || []];
-        if (e.checked) {
+        if (e.checked)
             _selectedTags.push(e.value);
-        } else {
-            _selectedTags = _selectedTags.filter((id) => id !== e.value);
-        }
+        else
+            _selectedTags = _selectedTags.filter(tag => tag.id !== e.value.id);
         setFormData({ ...formData, tags: _selectedTags });
     }
 
@@ -285,6 +285,7 @@ const EditPostPage = () => {
      */
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log("Form data:", formData);
         try {
             await fetchFromApi(`/post/update-post/${id}`, {
                 method: "PUT",
@@ -524,8 +525,9 @@ const EditPostPage = () => {
                                     />
                                     <label htmlFor={category.id} className="ml-2">
                                         {category.translations.map((translation, index) => (
-                                            <span key={index} className="mr-2">
-                                                {translation.name} ({translation.language.toUpperCase()})
+                                              <span key={index} className="mr-2">
+                                                {translation.name}
+                                                {index === 0 && " /"}
                                             </span>
                                         ))}
                                     </label>
@@ -546,7 +548,8 @@ const EditPostPage = () => {
                                     <label htmlFor={tag.id} className="ml-2">
                                         {tag.translations.map((translation, index) => (
                                             <span key={index} className="mr-2">
-                                                {translation.name} ({translation.language.toUpperCase()})
+                                                {translation.name}
+                                                {index === 0 && " /"}
                                             </span>
                                         ))}
                                     </label>

@@ -72,72 +72,49 @@ const Login = () => {
         <>
             <Toast ref={toast} />
             <div className="card">
-                <div className="flex flex-column md:flex-row">
-                    <div className="w-full md:w-5 flex flex-column align-items-center justify-content-center gap-3 py-5">
-                        <form onSubmit={handleSubmit}>
-                            <label 
-                                htmlFor="email" 
-                                className="text-secondary font-semibold block mb-3">
-                                    E-Mail
-                            </label>
-                            <InputText 
-                                id="email" 
-                                type="text" 
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                className="w-full p-calendar p-component p-inputwrapper mb-3"
-                                />
-                            <label 
-                                htmlFor="password" 
-                                className="text-secondary font-semibold block mb-3">
-                                    Password
-                            </label>
-                            <Password 
-                                value={formData.password}
-                                id="password"
-                                name="password"
-                                onChange={(e) => {
-                                    handleChange({
-                                        target: {
-                                            name: 'password',
-                                            value: e.target.value
-                                        }
-                                    });
-                                }}
-                                feedback={false} 
-                                tabIndex={1} 
-                                className="w-full p-calendar p-component p-inputwrapper mb-3"
-                                />
-                            
-                            <Button 
-                                label="Login"
-                                icon="pi pi-user" 
-                                type="submit"
-                                className="w-12rem"
-                                />
-                        </form>
-                    </div>
-
-                    <div className="w-full md:w-2">
-                        <Divider layout="vertical" className="hidden md:flex">
-                            <b>OR</b>
-                        </Divider>
-                        <Divider layout="horizontal" className="flex md:hidden" align="center">
-                            <b>OR</b>
-                        </Divider>
-                    </div>
-                    <div className="w-full md:w-5 flex align-items-center justify-content-center py-5">
-                        <Button 
-                            label="Sign Up" 
-                            icon="pi pi-user-plus" 
-                            severity="success" 
-                            className="w-12rem"
-                            onClick={() => navigate("/sign-up")}
-                            >
-                        </Button>
-                    </div>
-                </div>
+                <form onSubmit={handleSubmit}>
+                    <label 
+                        htmlFor="email" 
+                        className="text-secondary font-semibold block mb-3">
+                            E-Mail
+                    </label>
+                    <InputText 
+                        id="email" 
+                        type="text" 
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="w-full p-calendar p-component p-inputwrapper mb-3"
+                        />
+                    <label 
+                        htmlFor="password" 
+                        className="text-secondary font-semibold block mb-3">
+                            Password
+                    </label>
+                    <Password 
+                        value={formData.password}
+                        id="password"
+                        name="password"
+                        onChange={(e) => {
+                            handleChange({
+                                target: {
+                                    name: 'password',
+                                    value: e.target.value
+                                }
+                            });
+                        }}
+                        feedback={false} 
+                        tabIndex={1} 
+                        className="w-full p-calendar p-component p-inputwrapper mb-3"
+                        />
+                    
+                    <Button 
+                        label="Login"
+                        icon="pi pi-user" 
+                        type="submit"
+                        className="w-12rem"
+                        />
+                </form>
             </div>
 
         </>
