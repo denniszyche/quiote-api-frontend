@@ -3,6 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getUserRoles } from "../../../utils/auth.js";
 import Spinner from "../../components/Spinner";
 import { InputText } from "primereact/inputtext";
+import { InputTextarea } from "primereact/inputtextarea";
+import { Image } from "primereact/image";
+import MediaLibraryModalSingle from "../../components/MediaLibraryModalSingle";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
@@ -15,12 +18,18 @@ const EditUser = () => {
         last_name: "",
         email: "",
         roles: "",
+        userImageId: "",
+        userImageUrl: "",
+        linkedIn: "",
+        userBioEn: "",
+        userBioEs: "",
     });
     const [roles, setUserRoles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const toast = useRef(null);
     const navigate = useNavigate();
+    const [isMediaLibraryVisible, setIsMediaLibraryVisible] = useState(false);
     
     useEffect(() => {
         const checkAccess = () => {
@@ -36,30 +45,6 @@ const EditUser = () => {
     }, [navigate]);
 
     useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const response = await fetchFromApi(`/user/${id}`, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                    },
-                });
-                setFormData({
-                    first_name: response.user.first_name,
-                    last_name: response.user.last_name,
-                    email: response.user.email,
-                    roles: response.user.roles[0]?.id || null,
-                });
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchUser();
-    }, [id]);
-        
-    useEffect(() => {
         const fetchRoles = async () => {
             try {
                 const response = await fetchFromApi(
@@ -71,7 +56,6 @@ const EditUser = () => {
                         }
                     }
                 );
-
                 const formattedRoles = response.roles.map((role) => ({
                     name: role.name,
                     value: role.id,
@@ -88,6 +72,46 @@ const EditUser = () => {
         fetchRoles();
     }, []);
 
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await fetchFromApi(`/user/${id}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });  
+                let userImageUrl = "";
+                if (response.user.userImageId) {
+                    const imageResponse = await fetchFromApi(`/media/${response.user.userImageId}`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                        },
+                    });
+                    userImageUrl = `https://quiote-api.dztestserver.de/${imageResponse.media.filepath}`;
+                }
+                setFormData({
+                    first_name: response.user.first_name,
+                    last_name: response.user.last_name,
+                    email: response.user.email,
+                    roles: response.user.roles[0]?.id || null,
+                    userImageId: response.user.userImageId,
+                    userImageUrl: userImageUrl,
+                    linkedIn: response.user.linkedIn,
+                    userBioEn: response.user.userBioEn,
+                    userBioEs: response.user.userBioEs,
+                });
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUser();
+    }, [id]);
+        
+
     /**
      * Handle Input change
      * @param {*} e
@@ -100,31 +124,22 @@ const EditUser = () => {
         });
     };
 
+    const handleMediaSelect = async (image) => {
+        setFormData({
+            ...formData,
+            userImageId: image.id,
+            userImageUrl: `https://quiote-api.dztestserver.de/${image.filepath}`,
+        });
+    };
+
     /**
      * Handle form submit
      * @param {*} e
      */
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Vaidate the form
-        if (formData.first_name === "" || formData.last_name === "") {
-            toast.current.show({
-                severity: "warn",
-                summary: "Validation Error",
-                detail: "Bitte geben Sie einen Vornamen und Nachnamen ein",
-            });
-            return;
-        }
-        if (formData.email === "") {
-            toast.current.show({
-                severity: "warn",
-                summary: "Validation Error",
-                detail: "Bitte geben Sie eine E-Mail Adresse ein",
-            });
-            return;
-        }
         try {
-            const response = await fetchFromApi(
+            await fetchFromApi(
                 `/user/update-user/${id}`,
                 {
                     method: "PUT",
@@ -138,7 +153,7 @@ const EditUser = () => {
             toast.current.show({
                 severity: "success",
                 summary: "Success",
-                detail: "Benutzer*in erfolgreich aktualisiert",
+                detail: "User updated successfully",
             });
         } catch (error) {
             console.error("Error:", error);
@@ -159,12 +174,12 @@ const EditUser = () => {
             <Toast ref={toast} />
             <div className="flex">
                 <div className="card width-shadow">
-                    <h4>Benutzer*in bearbeiten</h4>
+                    <h4>Edit User</h4>
                     <form onSubmit={handleSubmit}>
                         <label 
                             htmlFor="first_name"
                             className="text-secondary font-semibold block mb-3">
-                            Vorname</label>
+                            First Name</label>
                         <InputText
                             id="first_name"
                             name="first_name"
@@ -175,7 +190,7 @@ const EditUser = () => {
                         <label 
                             htmlFor="last_name"
                             className="text-secondary font-semibold block mb-3">
-                            Nachname</label>
+                            Last Name</label>
                         <InputText
                             id="last_name"
                             name="last_name"
@@ -197,7 +212,7 @@ const EditUser = () => {
                         <label 
                             htmlFor="roles"
                             className="text-secondary font-semibold block mb-3">
-                            Rolle</label>
+                            Role</label>
                         <Dropdown
                             id="roles"
                             name="roles"
@@ -213,13 +228,80 @@ const EditUser = () => {
                             placeholder="Rolle auswählen"
                             className="w-full mb-3"
                         />
+                      <label 
+                            htmlFor="userImage"
+                            className="text-secondary font-semibold block mb-3">
+                            User Image</label>
+                        <Button
+                            label="Select Image"
+                            icon="pi pi-image"
+                            onClick={() => {
+                                setIsMediaLibraryVisible(true);
+                            }}
+                            className="p-button-sm mb-3"
+                            type="button"
+                        />
+                        {formData.userImageUrl && (
+                            <div className="mt-3">
+                                <Image 
+                                    src={formData.userImageUrl}
+                                    zoomSrc={formData.userImageUrl}
+                                    width="100" 
+                                    height="100" 
+                                    preview
+                                    style={{
+                                        objectFit: "cover",
+                                        backgroundColor: "#f0f0f0",
+                                    }}
+                                />
+                            </div>
+                        )}
+                        <label 
+                            htmlFor="userBioEn"
+                            className="text-secondary font-semibold block mb-3">
+                            User Bio (EN)</label>
+                        <InputTextarea
+                            id="userBioEn"
+                            name="userBioEn"
+                            value={formData.userBioEn}
+                            onChange={handleChange}
+                            rows={5}
+                            className="w-full p-calendar p-component p-inputwrapper mb-3"
+                        />
+                        <label 
+                            htmlFor="userBioEs"
+                            className="text-secondary font-semibold block mb-3">
+                            User Bio (ES)</label>
+                        <InputTextarea
+                            id="userBioEs"
+                            name="userBioEs"
+                            value={formData.userBioEs}
+                            onChange={handleChange}
+                            rows={5}
+                            className="w-full p-calendar p-component p-inputwrapper mb-3"
+                        />
+                        <label 
+                            htmlFor="linkedIn"
+                            className="text-secondary font-semibold block mb-3">
+                            LinkedIn</label>
+                        <InputText
+                            id="linkedIn"
+                            name="linkedIn"
+                            value={formData.linkedIn}
+                            onChange={handleChange}
+                            className="w-full p-calendar p-component p-inputwrapper mb-3"
+                        />
                         <Button type="submit" label="Benutzer aktualisieren"/>
                     </form>
                 </div>
             </div>
+            <MediaLibraryModalSingle
+                visible={isMediaLibraryVisible}
+                onHide={() => setIsMediaLibraryVisible(false)}
+                onSelect={handleMediaSelect}
+            />
         </>
     );
-
 }
 
 export default EditUser;

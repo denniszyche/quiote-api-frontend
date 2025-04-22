@@ -2,12 +2,15 @@ import React, { useEffect, useState, useRef } from "react";
 import { getUserRoles } from "../../../utils/auth.js";
 import Spinner from "../../components/Spinner";
 import { InputText } from "primereact/inputtext";
+import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { useNavigate } from "react-router-dom";
 import { Dropdown } from "primereact/dropdown";
 import { Password } from 'primereact/password';
 import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
+import MediaLibraryModalSingle from "../../components/MediaLibraryModalSingle";
+import { Image } from "primereact/image";
 
 const AddUserPage = () => {
     const [formData, setFormData] = useState({
@@ -15,6 +18,11 @@ const AddUserPage = () => {
         last_name: "",
         email: "",
         roles: null,
+        userImageId: "",
+        userImageUrl: "",
+        linkedIn: "",
+        userBioEn: "",
+        userBioEs: "",
         password: "",
         passwordConfirmation: "",
     });
@@ -22,7 +30,8 @@ const AddUserPage = () => {
     const toast = useRef(null);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    
+    const [isMediaLibraryVisible, setIsMediaLibraryVisible] = useState(false);
+
     useEffect(() => {
         const checkAccess = () => {
             const userRoles = getUserRoles();
@@ -51,7 +60,7 @@ const AddUserPage = () => {
                 toast.current.show({
                     severity: "error",
                     summary: "Error",
-                    detail: "Kategorien konnten nicht geladen werden.",
+                    detail: "Roles could not be fetched",
                 });
             }
         };
@@ -70,6 +79,14 @@ const AddUserPage = () => {
         });
     };
 
+    const handleMediaSelect = async (image) => {
+        setFormData({
+            ...formData,
+            userImageId: image.id,
+            userImageUrl: `https://quiote-api.dztestserver.de/${image.filepath}`,
+        });
+    };
+
     /**
      * Handle form submit
      * @param {*} e
@@ -80,7 +97,7 @@ const AddUserPage = () => {
             toast.current.show({
                 severity: "warn",
                 summary: "Validation Error",
-                detail: "Bitte geben Sie einen Vornamen und Nachnamen ein",
+                detail: "Please enter first and last name",
             });
             return;
         }
@@ -88,7 +105,7 @@ const AddUserPage = () => {
             toast.current.show({
                 severity: "warn",
                 summary: "Validation Error",
-                detail: "Bitte geben Sie eine E-Mail Adresse ein",
+                detail: "Please enter an email address",
             });
             return;
         }
@@ -96,7 +113,7 @@ const AddUserPage = () => {
             toast.current.show({
                 severity: "warn",
                 summary: "Validation Error",
-                detail: "Bitte geben Sie ein Passwort ein",
+                detail: "Please enter a password",
             });
             return;
         }
@@ -104,7 +121,7 @@ const AddUserPage = () => {
             toast.current.show({
                 severity: "warn",
                 summary: "Validation Error",
-                detail: "Bitte bestätigen Sie das Passwort",
+                detail: "Please confirm your password",
             });
             return;
         }
@@ -112,7 +129,7 @@ const AddUserPage = () => {
             toast.current.show({
                 severity: "warn",
                 summary: "Validation Error",
-                detail: "Passwörter stimmen nicht überein",
+                detail: "Passwords do not match",
             });
             return;
         }
@@ -128,13 +145,12 @@ const AddUserPage = () => {
             toast.current.show({
                 severity: "success",
                 summary: "Success",
-                detail: "Benutzer*in erfolgreich hinzugefügt",
+                detail: "User created successfully",
             });
             setTimeout(() => {
                 navigate("/all-user");
             }, 1500);
         } catch (error) {
-            console.error("Error:", error);
             toast.current.show({
                 severity: "error",
                 summary: "Error",
@@ -152,12 +168,12 @@ const AddUserPage = () => {
             <Toast ref={toast} />
             <div className="flex">
                 <div className="card width-shadow">
-                    <h4>Benutzer*in hinzufügen</h4>
+                    <h4>Add User</h4>
                     <form onSubmit={handleSubmit}>
                         <label 
                             htmlFor="first_name"
                             className="text-secondary font-semibold block mb-3">
-                            Vorname</label>
+                            First Name</label>
                         <InputText
                             id="first_name"
                             name="first_name"
@@ -168,7 +184,7 @@ const AddUserPage = () => {
                         <label 
                             htmlFor="last_name"
                             className="text-secondary font-semibold block mb-3">
-                            Nachname</label>
+                            Last Name</label>
                         <InputText
                             id="last_name"
                             name="last_name"
@@ -190,7 +206,7 @@ const AddUserPage = () => {
                         <label 
                             htmlFor="roles"
                             className="text-secondary font-semibold block mb-3">
-                            Rolle</label>
+                            Role</label>
                         <Dropdown
                             id="roles"
                             name="roles"
@@ -211,7 +227,7 @@ const AddUserPage = () => {
                         <label 
                             htmlFor="password"
                             className="text-secondary font-semibold block mb-3">
-                            Passwort</label>
+                            Password</label>
                         <Password
                             id="password"
                             name="password"
@@ -225,7 +241,7 @@ const AddUserPage = () => {
                         <label 
                             htmlFor="passwordConfirmation"
                             className="text-secondary font-semibold block mb-3">
-                            Passwort bestätigen</label>
+                            Password Confirmation</label>
                         <Password
                             id="passwordConfirmation"
                             name="passwordConfirmation"
@@ -236,10 +252,79 @@ const AddUserPage = () => {
                             toggleMask
                             placeholder="Passwort bestätigen"
                         />
+
+                      <label 
+                            htmlFor="userImage"
+                            className="text-secondary font-semibold block mb-3">
+                            User Image</label>
+                        <Button
+                            label="Select Image"
+                            icon="pi pi-image"
+                            onClick={() => {
+                                setIsMediaLibraryVisible(true);
+                            }}
+                            className="p-button-sm mb-3"
+                            type="button"
+                        />
+                        {formData.userImageUrl && (
+                            <div className="mt-3">
+                                <Image 
+                                    src={formData.userImageUrl}
+                                    zoomSrc={formData.userImageUrl}
+                                    width="100" 
+                                    height="100" 
+                                    preview
+                                    style={{
+                                        objectFit: "cover",
+                                        backgroundColor: "#f0f0f0",
+                                    }}
+                                />
+                            </div>
+                        )}
+                        <label 
+                            htmlFor="userBioEn"
+                            className="text-secondary font-semibold block mb-3">
+                            User Bio (EN)</label>
+                        <InputTextarea
+                            id="userBioEn"
+                            name="userBioEn"
+                            value={formData.userBioEn}
+                            onChange={handleChange}
+                            rows={5}
+                            className="w-full p-calendar p-component p-inputwrapper mb-3"
+                        />
+                        <label 
+                            htmlFor="userBioEs"
+                            className="text-secondary font-semibold block mb-3">
+                            User Bio (ES)</label>
+                        <InputTextarea
+                            id="userBioEs"
+                            name="userBioEs"
+                            value={formData.userBioEs}
+                            onChange={handleChange}
+                            rows={5}
+                            className="w-full p-calendar p-component p-inputwrapper mb-3"
+                        />
+                        <label 
+                            htmlFor="linkedIn"
+                            className="text-secondary font-semibold block mb-3">
+                            LinkedIn</label>
+                        <InputText
+                            id="linkedIn"
+                            name="linkedIn"
+                            value={formData.linkedIn}
+                            onChange={handleChange}
+                            className="w-full p-calendar p-component p-inputwrapper mb-3"
+                        />
                         <Button type="submit" label="Benutzer*in hinzufügen"  />
                     </form>
                 </div>
             </div>
+            <MediaLibraryModalSingle
+                visible={isMediaLibraryVisible}
+                onHide={() => setIsMediaLibraryVisible(false)}
+                onSelect={handleMediaSelect}
+            />
         </>
     );
 };
