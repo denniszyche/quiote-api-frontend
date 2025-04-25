@@ -69,8 +69,6 @@ const EditPostPage = () => {
                     });
                     featuredImageUrl = `https://quiote-api.dztestserver.de/${imageResponse.media.filepath}`;
                 }
-
-                console.log("Post data:", response.post.tags);
                 setFormData({
                     ...formData,
                     featuredImageId: response.post.featuredImageId,
@@ -84,18 +82,17 @@ const EditPostPage = () => {
                     updatedAt: response.post.updatedAt,
                     translations: response.post.translations
                         .map((translation) => ({
-                        title: translation.title,
-                        excerpt: translation.excerpt,
-                        content: translation.content,
-                        language: translation.language,
-                        details: {
-                            city: translation.details.city,
-                            country: translation.details.country,
-                            status: translation.details.status,
-                        }
-                    })),
+                            title: translation.title,
+                            excerpt: translation.excerpt,
+                            content: translation.content,
+                            language: translation.language,
+                            details: {
+                                city: translation.details.city,
+                                country: translation.details.country,
+                                status: translation.details.status,
+                            }
+                        })),
                 });
-
                 response.post.gallery.forEach((image) => {
                     const imageUrl = `https://quiote-api.dztestserver.de/${image.filepath}`;
                     setFormData((prevState) => ({

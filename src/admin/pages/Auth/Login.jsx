@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { InputText } from 'primereact/inputtext';
 import { Password } from 'primereact/password';
 import { Button } from "primereact/button";
+import { Link } from "react-router-dom";
 import { Toast } from "primereact/toast";
-import { Divider } from "primereact/divider";
-import {fetchFromApi}  from "../../utils/fetchFromApi.js";
+import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -84,7 +84,7 @@ const Login = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full p-calendar p-component p-inputwrapper mb-3"
+                        className="w-full p-component p-inputwrapper mb-3"
                         />
                     <label 
                         htmlFor="password" 
@@ -106,14 +106,19 @@ const Login = () => {
                         feedback={false} 
                         tabIndex={1} 
                         className="w-full p-calendar p-component p-inputwrapper mb-3"
-                        />
-                    
+                    />
                     <Button 
                         label="Login"
                         icon="pi pi-user" 
                         type="submit"
                         className="w-12rem"
                         />
+
+                    <div className="flex justify-content-end mt-3">
+                        <Link to="/reset-password">
+                            Forgot Password?
+                        </Link>
+                    </div>
                 </form>
             </div>
 

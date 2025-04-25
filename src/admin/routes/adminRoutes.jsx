@@ -4,7 +4,9 @@ import Spinner from "../components/Spinner";
 import { Suspense } from "react";
 
 const AdminRoot = lazy(() => import("../pages/AdminRoot"));
-const LoginPage = lazy(() => import("../pages/Login"));
+const LoginPage = lazy(() => import("../pages/Auth/Login"));
+const ResetPasswordPage = lazy(() => import("../pages/Auth/ResetPassword"));
+const ChangePasswordPage = lazy(() => import("../pages/Auth/ChangePassword"));
 const ErrorPage = lazy(() => import("../pages/Error"));
 const AllPostsPage = lazy(() => import("../pages/Post/AllPosts"));
 const AddPostPage = lazy(() => import("../pages/Post/AddPost"));
@@ -39,6 +41,22 @@ const adminRoutes = [
                 element: (
                     <Suspense fallback={<Spinner />}>
                         <LoginPage />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "/reset-password",
+                element: (
+                    <Suspense fallback={<Spinner />}>
+                        <ResetPasswordPage />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "/change-password/:id",
+                element: (
+                    <Suspense fallback={<Spinner />}>
+                        <ChangePasswordPage />
                     </Suspense>
                 ),
             },
