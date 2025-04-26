@@ -316,7 +316,7 @@ const AddUserPage = () => {
                             onChange={handleChange}
                             className="w-full p-calendar p-component p-inputwrapper mb-3"
                         />
-                        <Button type="submit" label="Benutzer*in hinzufügen"  />
+                        <Button type="submit" label="Add User" icon="pi pi-check" className="p-button-sm" />
                     </form>
                 </div>
             </div>
