@@ -151,10 +151,13 @@ const AddUserPage = () => {
                 navigate("/all-user");
             }, 1500);
         } catch (error) {
+            const errorMessages = error.errors
+                ? error.errors.map((err) => err.msg).join(", ")
+                : error.message;
             toast.current.show({
                 severity: "error",
                 summary: "Error",
-                detail: error.message,
+                detail: errorMessages,
             });
         }
     };

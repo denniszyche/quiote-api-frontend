@@ -60,10 +60,13 @@ const Login = () => {
             navigate("/dashboard", { replace: true });
         }
         catch (error) {
+            const errorMessages = error.errors
+                ? error.errors.map((err) => err.msg).join(", ")
+                : error.message;
             toast.current.show({
                 severity: "error",
-                summary: "Login Failed",
-                detail: "Invalid email or password",
+                summary: "Error",
+                detail: errorMessages,
             });
         }
     }

@@ -78,6 +78,7 @@ const ChangePassword = () => {
             });
             return;
         }
+        console.log(formData);
         try {
             await fetchFromApi("/auth/change-password", {
                 method: "POST",
@@ -86,6 +87,7 @@ const ChangePassword = () => {
                 },
                 body: JSON.stringify({
                     password: formData.password,
+                    confirmPassword: formData.confirmPassword,
                     userId: formData.userId
                 }),
             });
@@ -99,10 +101,13 @@ const ChangePassword = () => {
             }, 2000);
         }
         catch (error) {
+            const errorMessages = error.errors
+                ? error.errors.map((err) => err.msg).join(", ")
+                : error.message;
             toast.current.show({
                 severity: "error",
                 summary: "Error",
-                detail: "Failed to change password",
+                detail: errorMessages,
             });
         }
     }
