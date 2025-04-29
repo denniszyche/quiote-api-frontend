@@ -13,6 +13,7 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { Image } from 'primereact/image';
 import ContentEditor from "../../components/ContentEditor";
 import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
+import { Calendar } from "primereact/calendar";
 
 const AddPostPage = () => {
     const [formData, setFormData] = useState({
@@ -40,6 +41,8 @@ const AddPostPage = () => {
                 status: ""
             } },
         ],
+        createdAt: new Date(),
+        external_link: "",
     });
     const [categories, setCategories] = useState([]);
     const [tags, setTags] = useState([]);
@@ -232,11 +235,13 @@ const AddPostPage = () => {
                 navigate("/all-posts");
             }, 1500);
         } catch (error) {
-            console.error("Error:", error);
+            const errorMessages = error.errors
+                ? error.errors.map((err) => err.msg).join(", ")
+                : error.message;
             toast.current.show({
                 severity: "error",
                 summary: "Error",
-                detail: error.message,
+                detail: errorMessages,
             });
         }
     };
@@ -323,6 +328,18 @@ const AddPostPage = () => {
                     </div>
                     <div className="w-full md:w-4">
                         <div className="card width-shadow w-100 mb-3">
+                            <label htmlFor="createdAt" className="text-secondary font-semibold block mb-3">
+                                Publish Date
+                            </label>
+                            <Calendar
+                                id="createdAt"
+                                name="createdAt"
+                                value={formData.createdAt || new Date()}
+                                onChange={(e) => handleChange({ target: { name: "createdAt", value: e.value } })}
+                                showTime
+                                dateFormat="dd/mm/yy"
+                                className="w-full mb-3"
+                            />
                             <label 
                                 htmlFor="status"
                                 className="text-secondary font-semibold block mb-3">
@@ -357,6 +374,22 @@ const AddPostPage = () => {
                                 placeholder="Select a status"
                                 className="w-full mb-3"
                             />
+                            {/* Conditionally render the external_link input */}
+                            {formData.post_type === "link" && (
+                                <>
+                                    <label
+                                        htmlFor="external_link"
+                                        className="text-secondary font-semibold block mb-3">
+                                        External Link</label>
+                                    <InputText
+                                        id="external_link"
+                                        name="external_link"
+                                        value={formData.external_link}
+                                        onChange={handleChange}
+                                        className="w-full mb-3"
+                                    /> 
+                                </>
+                            )}
                             <label 
                                 htmlFor="featured"
                                 className="text-secondary font-semibold block mb-3">

@@ -14,6 +14,7 @@ import { Image } from 'primereact/image';
 import { format } from "date-fns";
 import ContentEditor from "../../components/ContentEditor";
 import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
+import { Calendar } from "primereact/calendar";
 
 const EditPostPage = () => {
     const { id } = useParams();
@@ -27,7 +28,6 @@ const EditPostPage = () => {
         post_type: "",
         categories: [],
         tags: [],
-        createdAt: "",
         updatedAt: "",
         translations: [
             { language: "en", title: "", excerpt: "", content: "", details: {
@@ -41,6 +41,8 @@ const EditPostPage = () => {
                 status: ""
             } },
         ],
+        createdAt: "",
+        external_link: "",
     });
     const [categories, setCategories] = useState([]);
     const [tags, setTags] = useState([]);
@@ -78,7 +80,6 @@ const EditPostPage = () => {
                     post_type: response.post.post_type,
                     categories: response.post.categories.map((cat) => cat.id),
                     tags: response.post.tags.map((tag) => tag.id),
-                    createdAt: response.post.createdAt,
                     updatedAt: response.post.updatedAt,
                     translations: response.post.translations
                         .map((translation) => ({
@@ -92,6 +93,9 @@ const EditPostPage = () => {
                                 status: translation.details.status,
                             }
                         })),
+                    external_link: response.post.external_link,
+                    createdAt: response.post.createdAt,
+
                 });
                 response.post.gallery.forEach((image) => {
                     const imageUrl = `https://quiote-api.dztestserver.de/${image.filepath}`;
@@ -260,7 +264,7 @@ const EditPostPage = () => {
         const { name, value } = e.target || e;
         setFormData({
             ...formData,
-            [name]: value,
+            [name]: name === "createdAt" ? value.toISOString() : value,
         });
     };
 
@@ -298,11 +302,13 @@ const EditPostPage = () => {
                 detail: "Post updated successfully.",
             });
         } catch (error) {
-            console.error("Error:", error);
+            const errorMessages = error.errors
+                ? error.errors.map((err) => err.msg).join(", ")
+                : error.message;
             toast.current.show({
                 severity: "error",
                 summary: "Error",
-                detail: error.message,
+                detail: errorMessages,
             });
         }
     }
@@ -398,6 +404,18 @@ const EditPostPage = () => {
                     </div>
                     <div className="w-full md:w-4">
                         <div className="card width-shadow w-100 mb-3">
+                            <label htmlFor="createdAt" className="text-secondary font-semibold block mb-3">
+                                Publish Date
+                            </label>
+                            <Calendar
+                                id="createdAt"
+                                name="createdAt"
+                                value={formData.createdAt ? new Date(formData.createdAt) : new Date()}
+                                onChange={handleChange}
+                                dateFormat="dd/mm/yy"
+                                showIcon
+                                className="w-full mb-3"
+                            />
                             <label 
                                 htmlFor="status"
                                 className="text-secondary font-semibold block mb-3">
@@ -432,18 +450,22 @@ const EditPostPage = () => {
                                 placeholder="Select a status"
                                 className="w-full mb-3"
                             />
-                            <label
-                                htmlFor="createdAt"
-                                className="text-secondary font-semibold block mb-3">
-                                Created At</label>
-                            <InputText
-                                id="createdAt"
-                                name="createdAt"
-                                value={formatDate(formData.createdAt)}
-                                onChange={handleChange}
-                                disabled
-                                className="w-full p-calendar p-component p-inputwrapper mb-3"
-                            />
+                            {/* Conditionally render the external_link input */}
+                            {formData.post_type === "link" && (
+                                <>
+                                    <label
+                                        htmlFor="external_link"
+                                        className="text-secondary font-semibold block mb-3">
+                                        External Link</label>
+                                    <InputText
+                                        id="external_link"
+                                        name="external_link"
+                                        value={formData.external_link}
+                                        onChange={handleChange}
+                                        className="w-full mb-3"
+                                    /> 
+                                </>
+                            )}
                             <label 
                                 htmlFor="updatedAt"
                                 className="text-secondary font-semibold block mb-3">

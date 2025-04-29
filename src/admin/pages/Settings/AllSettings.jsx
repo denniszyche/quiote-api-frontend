@@ -10,8 +10,8 @@ import { fetchFromApi } from "../../../utils/fetchFromApi.js";
 
 const AllSettings = () => {
     const [formData, setFormData] = useState({
-        info: { en: "", es: "" }, // Two languages for info
-        admin_contact: "", // Single field
+        info: { en: "", es: "" },
+        admin_contact: { email: "" },
         contact: { 
             street: "", 
             colonia: "", 
@@ -20,13 +20,12 @@ const AllSettings = () => {
             country: "", 
             phone: "", 
             email: "" 
-        }, // Object for contact
+        }
     });
     const [loading, setLoading] = useState(true);
     const toast = useRef(null);
     const navigate = useNavigate();
 
-    // Check user access
     useEffect(() => {
         const checkAccess = () => {
             const userRoles = getUserRoles();
@@ -51,24 +50,15 @@ const AllSettings = () => {
                     },
                 });
                 const settings = response.settings || [];
-                const updatedFormData = {
-                    info: {
-                        en: settings.find((s) => s.key === "info" && s.language === "en")?.value || "",
-                        es: settings.find((s) => s.key === "info" && s.language === "es")?.value || "",
-                    },
-                    admin_contact: settings.find((s) => s.key === "admin_contact")?.value || "",
-                    contact: {
-                        street: "",
-                        colonia: "",
-                        region: "",
-                        city: "",
-                        country: "",
-                        phone: "",
-                        email: "",
-                        ...JSON.parse(settings.find((s) => s.key === "contact")?.value || "{}"), // Merge with defaults
-                    },
-                };
-                setFormData(updatedFormData);
+                console.log(settings);
+                const updatedFormData = {};
+                settings.forEach((setting) => {
+                    updatedFormData[setting.key] = setting.value || "";
+                });
+                setFormData((prevFormData) => ({
+                    ...prevFormData,
+                    ...updatedFormData,
+                }));
             } catch (error) {
                 console.error("Error fetching data:", error);
                 toast.current.show({
@@ -100,6 +90,14 @@ const AllSettings = () => {
                     [languageOrValue]: value,
                 },
             });
+        } else if (key === "admin_contact") {
+            setFormData({
+                ...formData,
+                admin_contact: {
+                    ...formData.admin_contact,
+                    [languageOrValue]: value,
+                },
+            });
         } else {
             setFormData({
                 ...formData,
@@ -112,7 +110,7 @@ const AllSettings = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetchFromApi("/setting/update-settings", {
+            await fetchFromApi("/setting/update-settings", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -122,9 +120,6 @@ const AllSettings = () => {
                     settings: formData,
                 }),
             });
-            if (!response.ok) {
-                throw new Error("Failed to update settings.");
-            }
             toast.current.show({
                 severity: "success",
                 summary: "Success",
@@ -132,7 +127,6 @@ const AllSettings = () => {
                 zindex: 1000,
             });
         } catch (error) {
-            console.error("Error updating settings:", error);
             toast.current.show({
                 severity: "error",
                 summary: "Error",
@@ -162,7 +156,7 @@ const AllSettings = () => {
                             </label>
                             <InputTextarea
                                 id="info-en"
-                                value={formData.info.en || ""} // Ensure fallback to empty string
+                                value={formData.info.en || ""}
                                 onChange={(e) => handleInputChange("info", "en", e.target.value)}
                                 className="p-inputtext-sm w-full mb-3"
                                 rows={3}
@@ -182,13 +176,13 @@ const AllSettings = () => {
                         {/* Admin Contact Field */}
                         <div className="mb-4">
                             <label htmlFor="admin_contact" className="block mb-3">
-                                Admin Contact
+                                Admin Contact Email
                             </label>
                             <InputText
                                 id="admin_contact"
                                 type="text"
-                                value={formData.admin_contact || ""} // Ensure fallback to empty string
-                                onChange={(e) => handleInputChange("admin_contact", e.target.value)}
+                                value={formData.admin_contact.email || ""} // Ensure fallback to empty string
+                                onChange={(e) => handleInputChange("admin_contact", "email", e.target.value)}
                                 className="p-inputtext-sm w-full"
                             />
                         </div>
@@ -201,7 +195,7 @@ const AllSettings = () => {
                             <InputText
                                 id="contact-street"
                                 type="text"
-                                value={formData.contact.street || ""} // Ensure fallback to empty string
+                                value={formData.contact.street || ""} 
                                 onChange={(e) => handleInputChange("contact", "street", e.target.value)}
                                 className="p-inputtext-sm w-full mb-3"
                             />
@@ -210,7 +204,7 @@ const AllSettings = () => {
                             <InputText
                                 id="contact-colonia"
                                 type="text"
-                                value={formData.contact.colonia || ""} // Ensure fallback to empty string
+                                value={formData.contact.colonia || ""}
                                 onChange={(e) => handleInputChange("contact", "colonia", e.target.value)}
                                 className="p-inputtext-sm w-full mb-3"
                             />
@@ -219,7 +213,7 @@ const AllSettings = () => {
                             <InputText
                                 id="contact-region"
                                 type="text"
-                                value={formData.contact.region || ""} // Ensure fallback to empty string
+                                value={formData.contact.region || ""}
                                 onChange={(e) => handleInputChange("contact", "region", e.target.value)}
                                 className="p-inputtext-sm w-full mb-3"
                             />
@@ -228,7 +222,7 @@ const AllSettings = () => {
                             <InputText
                                 id="contact-city"
                                 type="text"
-                                value={formData.contact.city || ""} // Ensure fallback to empty string
+                                value={formData.contact.city || ""}
                                 onChange={(e) => handleInputChange("contact", "city", e.target.value)}
                                 className="p-inputtext-sm w-full mb-3"
                             />
@@ -246,7 +240,7 @@ const AllSettings = () => {
                             <InputText
                                 id="contact-phone"
                                 type="text"
-                                value={formData.contact.phone || ""} // Ensure fallback to empty string
+                                value={formData.contact.phone || ""}
                                 onChange={(e) => handleInputChange("contact", "phone", e.target.value)}
                                 className="p-inputtext-sm w-full mb-3"
                             />
@@ -255,11 +249,11 @@ const AllSettings = () => {
                             <InputText
                                 id="contact-email"
                                 type="text"
-                                value={formData.contact.email || ""} // Ensure fallback to empty string
+                                value={formData.contact.email || ""}
                                 onChange={(e) => handleInputChange("contact", "email", e.target.value)}
                                 className="p-inputtext-sm w-full mb-3"
                             />
-                        </div>
+                        </div> 
 
                         <Button type="submit" label="Save Settings" className="p-button-success" />
                     </form>
