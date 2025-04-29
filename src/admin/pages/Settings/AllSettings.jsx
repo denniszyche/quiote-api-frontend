@@ -4,6 +4,9 @@ import { getUserRoles } from "../../../utils/auth.js";
 import Spinner from "../../components/Spinner";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
+import { InputText } from "primereact/inputtext";
+import { InputTextarea } from "primereact/inputtextarea";
+import { fetchFromApi } from "../../../utils/fetchFromApi.js";
 
 const AllSettings = () => {
     const [formData, setFormData] = useState({
@@ -41,25 +44,29 @@ const AllSettings = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://localhost:3000/setting/all-settings", {
+                const response = await fetchFromApi("/setting/all-settings", {
+                    method: "GET",
                     headers: {
                         "Authorization": `Bearer ${localStorage.getItem("token")}`,
                     },
                 });
-                if (!response.ok) {
-                    throw new Error("Failed to fetch data.");
-                }
-                const result = await response.json();
-
-                // Populate formData with existing settings
-                const settings = result.settings || [];
+                const settings = response.settings || [];
                 const updatedFormData = {
                     info: {
                         en: settings.find((s) => s.key === "info" && s.language === "en")?.value || "",
                         es: settings.find((s) => s.key === "info" && s.language === "es")?.value || "",
                     },
                     admin_contact: settings.find((s) => s.key === "admin_contact")?.value || "",
-                    contact: JSON.parse(settings.find((s) => s.key === "contact")?.value || "{}"), // Parse contact as an object
+                    contact: {
+                        street: "",
+                        colonia: "",
+                        region: "",
+                        city: "",
+                        country: "",
+                        phone: "",
+                        email: "",
+                        ...JSON.parse(settings.find((s) => s.key === "contact")?.value || "{}"), // Merge with defaults
+                    },
                 };
                 setFormData(updatedFormData);
             } catch (error) {
@@ -105,19 +112,14 @@ const AllSettings = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch("http://localhost:3000/setting/update-settings", {
+            const response = await fetchFromApi("/setting/update-settings", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${localStorage.getItem("token")}`,
                 },
                 body: JSON.stringify({
-                    settings: [
-                        { key: "info", language: "en", value: formData.info.en },
-                        { key: "info", language: "es", value: formData.info.es },
-                        { key: "admin_contact", value: formData.admin_contact },
-                        { key: "contact", value: JSON.stringify(formData.contact) }, // Stringify contact object
-                    ],
+                    settings: formData,
                 }),
             });
             if (!response.ok) {
@@ -153,116 +155,110 @@ const AllSettings = () => {
                     <form onSubmit={handleSubmit}>
                         {/* Info Field (Two Languages) */}
                         <div className="mb-4">
-                            <h5>Info Text</h5>
-                            <label htmlFor="info-en" className="block mb-2">
+                            <h4>Info Text</h4>
+                            <label 
+                                htmlFor="info-en" className="block mb-3">
                                 English
                             </label>
-                            <input
+                            <InputTextarea
                                 id="info-en"
-                                type="text"
-                                value={formData.info.en}
+                                value={formData.info.en || ""} // Ensure fallback to empty string
                                 onChange={(e) => handleInputChange("info", "en", e.target.value)}
-                                className="p-inputtext-sm w-full mb-2"
+                                className="p-inputtext-sm w-full mb-3"
+                                rows={3}
                             />
-                            <label htmlFor="info-es" className="block mb-2">
+                            <label htmlFor="info-es" className="block mb-3">
                                 Spanish
                             </label>
-                            <input
+                            <InputTextarea
                                 id="info-es"
-                                type="text"
-                                value={formData.info.es}
+                                value={formData.info.es || ""} // Ensure fallback to empty string
                                 onChange={(e) => handleInputChange("info", "es", e.target.value)}
-                                className="p-inputtext-sm w-full"
+                                className="p-inputtext-sm w-full mb-3"
+                                rows={3}
                             />
                         </div>
 
                         {/* Admin Contact Field */}
                         <div className="mb-4">
-                            <label htmlFor="admin_contact" className="block mb-2">
+                            <label htmlFor="admin_contact" className="block mb-3">
                                 Admin Contact
                             </label>
-                            <input
+                            <InputText
                                 id="admin_contact"
                                 type="text"
-                                value={formData.admin_contact}
-                                onChange={(e) => handleInputChange("admin_contact", null, e.target.value)}
+                                value={formData.admin_contact || ""} // Ensure fallback to empty string
+                                onChange={(e) => handleInputChange("admin_contact", e.target.value)}
                                 className="p-inputtext-sm w-full"
                             />
                         </div>
 
                         {/* Contact Field (Predefined Fields) */}
                         <div className="mb-4">
-                            <h5>Contact</h5>
-                            <div className="mb-2">
-                                <label htmlFor="contact-street" className="block mb-2">Street</label>
-                                <input
-                                    id="contact-street"
-                                    type="text"
-                                    value={formData.contact.street}
-                                    onChange={(e) => handleInputChange("contact", "street", e.target.value)}
-                                    className="p-inputtext-sm w-full"
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="contact-colonia" className="block mb-2">Colonia</label>
-                                <input
-                                    id="contact-colonia"
-                                    type="text"
-                                    value={formData.contact.colonia}
-                                    onChange={(e) => handleInputChange("contact", "colonia", e.target.value)}
-                                    className="p-inputtext-sm w-full"
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="contact-region" className="block mb-2">Region</label>
-                                <input
-                                    id="contact-region"
-                                    type="text"
-                                    value={formData.contact.region}
-                                    onChange={(e) => handleInputChange("contact", "region", e.target.value)}
-                                    className="p-inputtext-sm w-full"
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="contact-city" className="block mb-2">City</label>
-                                <input
-                                    id="contact-city"
-                                    type="text"
-                                    value={formData.contact.city}
-                                    onChange={(e) => handleInputChange("contact", "city", e.target.value)}
-                                    className="p-inputtext-sm w-full"
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="contact-country" className="block mb-2">Country</label>
-                                <input
-                                    id="contact-country"
-                                    type="text"
-                                    value={formData.contact.country}
-                                    onChange={(e) => handleInputChange("contact", "country", e.target.value)}
-                                    className="p-inputtext-sm w-full"
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="contact-phone" className="block mb-2">Phone</label>
-                                <input
-                                    id="contact-phone"
-                                    type="text"
-                                    value={formData.contact.phone}
-                                    onChange={(e) => handleInputChange("contact", "phone", e.target.value)}
-                                    className="p-inputtext-sm w-full"
-                                />
-                            </div>
-                            <div className="mb-2">
-                                <label htmlFor="contact-email" className="block mb-2">Email</label>
-                                <input
-                                    id="contact-email"
-                                    type="text"
-                                    value={formData.contact.email}
-                                    onChange={(e) => handleInputChange("contact", "email", e.target.value)}
-                                    className="p-inputtext-sm w-full"
-                                />
-                            </div>
+                            <h4>Contact</h4>
+                            
+                            <label htmlFor="contact-street" className="block mb-3">Street</label>
+                            <InputText
+                                id="contact-street"
+                                type="text"
+                                value={formData.contact.street || ""} // Ensure fallback to empty string
+                                onChange={(e) => handleInputChange("contact", "street", e.target.value)}
+                                className="p-inputtext-sm w-full mb-3"
+                            />
+                            
+                            <label htmlFor="contact-colonia" className="block mb-3">Colonia</label>
+                            <InputText
+                                id="contact-colonia"
+                                type="text"
+                                value={formData.contact.colonia || ""} // Ensure fallback to empty string
+                                onChange={(e) => handleInputChange("contact", "colonia", e.target.value)}
+                                className="p-inputtext-sm w-full mb-3"
+                            />
+
+                            <label htmlFor="contact-region" className="block mb-3">Region</label>
+                            <InputText
+                                id="contact-region"
+                                type="text"
+                                value={formData.contact.region || ""} // Ensure fallback to empty string
+                                onChange={(e) => handleInputChange("contact", "region", e.target.value)}
+                                className="p-inputtext-sm w-full mb-3"
+                            />
+                            
+                            <label htmlFor="contact-city" className="block mb-3">City</label>
+                            <InputText
+                                id="contact-city"
+                                type="text"
+                                value={formData.contact.city || ""} // Ensure fallback to empty string
+                                onChange={(e) => handleInputChange("contact", "city", e.target.value)}
+                                className="p-inputtext-sm w-full mb-3"
+                            />
+                            
+                            <label htmlFor="contact-country" className="block mb-3">Country</label>
+                            <InputText
+                                id="contact-country"
+                                type="text"
+                                value={formData.contact.country || ""} // Ensure fallback to empty string
+                                onChange={(e) => handleInputChange("contact", "country", e.target.value)}
+                                className="p-inputtext-sm w-full mb-3"
+                            />
+
+                            <label htmlFor="contact-phone" className="block mb-3">Phone</label>
+                            <InputText
+                                id="contact-phone"
+                                type="text"
+                                value={formData.contact.phone || ""} // Ensure fallback to empty string
+                                onChange={(e) => handleInputChange("contact", "phone", e.target.value)}
+                                className="p-inputtext-sm w-full mb-3"
+                            />
+                            
+                            <label htmlFor="contact-email" className="block mb-3">Email</label>
+                            <InputText
+                                id="contact-email"
+                                type="text"
+                                value={formData.contact.email || ""} // Ensure fallback to empty string
+                                onChange={(e) => handleInputChange("contact", "email", e.target.value)}
+                                className="p-inputtext-sm w-full mb-3"
+                            />
                         </div>
 
                         <Button type="submit" label="Save Settings" className="p-button-success" />
