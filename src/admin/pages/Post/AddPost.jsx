@@ -536,6 +536,7 @@ const AddPostPage = () => {
                                     </div>
                                 )}
                         </div>
+                        {/* Categories */}
                         <div className="card width-shadow w-100 mb-3">
                             <h4>Categories</h4>
                             {categories.map((category, index) => (
@@ -548,16 +549,19 @@ const AddPostPage = () => {
                                         checked={formData.categories.some((item) => item.id === category.id)}
                                     />
                                     <label htmlFor={category.id} className="ml-2">
-                                        {category.translations.map((translation, index) => (
-                                            <span key={index} className="mr-2">
-                                                {translation.name}
-                                                {index === 0 && " /"}
-                                            </span>
+                                        {category.translations
+                                            .sort((a, b) => a.language.localeCompare(b.language))
+                                            .map((translation, index) => (
+                                                <span key={index} className="mr-2">
+                                                    {translation.name}
+                                                    {index === 0 && " /"}
+                                                </span>
                                         ))}
                                     </label>
                                 </div>
                             ))}
                         </div>
+                        {/* Tags */}
                         <div className="card width-shadow w-100 mb-3">
                             <h4>Tags</h4>
                             {tags.map((tag, index) => (
@@ -570,11 +574,13 @@ const AddPostPage = () => {
                                         checked={formData.tags.some((item) => item.id === tag.id)}
                                     />
                                     <label htmlFor={tag.id} className="ml-2">
-                                        {tag.translations.map((translation, index) => (
-                                            <span key={index} className="mr-2">
-                                                {translation.name}
-                                                {index === 0 && " /"}
-                                            </span>
+                                        {tag.translations
+                                            .sort((a, b) => a.language.localeCompare(b.language))
+                                            .map((translation, index) => (
+                                                <span key={index} className="mr-2">
+                                                    {translation.name}
+                                                    {index === 0 && " /"}
+                                                </span>
                                         ))}
                                     </label>
                                 </div>

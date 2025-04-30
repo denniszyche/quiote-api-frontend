@@ -9,12 +9,13 @@ import { Toast } from "primereact/toast";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { format } from "date-fns";
 import { Image } from 'primereact/image';
+import { InputText } from "primereact/inputtext";
 import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
-
 
 const AllMediaPage = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [globalFilter, setGlobalFilter] = useState("");
     const toast = useRef(null);
     const navigate = useNavigate();
 
@@ -145,16 +146,31 @@ const AllMediaPage = () => {
         
         <div className="flex">
             <div className="card width-shadow w-100">
-                <h4>All Media</h4>
-                <Button
-                    label="Add Media"
-                    icon="pi pi-plus"
-                    className="p-button-success mb-3"
-                    onClick={() => navigate("/add-media")}
-                />
                 <Toast ref={toast} />
                 <ConfirmDialog />
-                <DataTable value={data}>
+                <h4>All Media</h4>
+                <div className="flex justify-content-between align-items-center mb-3">
+                    <Button
+                        label="Add Media"
+                        icon="pi pi-plus"
+                        className="p-button-success"
+                        onClick={() => navigate("/add-media")}
+                    />
+                    <span className="p-input-icon-left">
+                        <InputText
+                            value={globalFilter}
+                            onChange={(e) => setGlobalFilter(e.target.value)}
+                            placeholder="Search by filename or alt text"
+                        />
+                    </span>
+                </div>
+                <DataTable 
+                    value={data}
+                    paginator
+                    rows={10}
+                    rowsPerPageOptions={[5, 10, 20]}
+                    globalFilter={globalFilter}
+                >
                     <Column field="id" header="ID" />
                     <Column
                         header="Thumbnail"

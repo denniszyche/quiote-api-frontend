@@ -407,7 +407,7 @@ const EditPostPage = () => {
                         {/* Collaborators */}
                         <div className="card width-shadow w-100 mb-3">
                             <h4>Collaborators</h4>
-                            {formData.collaborator.map((collab, index) => (
+                            {Array.isArray(formData.collaborator) && formData.collaborator.map((collab, index) => (
                                 <div key={index} className="flex align-items-end gap-3 mb-3">
                                     <div className="flex-grow-1">
                                         <label htmlFor={`collaborator-name-${index}`} className="block mb-2">
@@ -452,7 +452,7 @@ const EditPostPage = () => {
                         {/* Photographers */}
                         <div className="card width-shadow w-100 mb-3">
                             <h4>Photographers</h4>
-                            {formData.photographer.map((photo, index) => (
+                            {Array.isArray(formData.photographer) && formData.photographer.map((photo, index) => (
                                 <div key={index} className="flex align-items-end gap-3 mb-3">
                                     <div className="flex-grow-1">
                                         <label htmlFor={`photographer-name-${index}`} className="block mb-2">
@@ -624,6 +624,7 @@ const EditPostPage = () => {
                                     </>  
                                 )}
                         </div>
+                        {/* Categories */}
                         <div className="card width-shadow w-100 mb-3">
                             <h4>Categories</h4>
                             {categories.map((category) => (
@@ -636,8 +637,10 @@ const EditPostPage = () => {
                                         checked={formData.categories.includes(category.id)}
                                     />
                                     <label htmlFor={category.id} className="ml-2">
-                                        {category.translations.map((translation, index) => (
-                                              <span key={index} className="mr-2">
+                                    {category.translations
+                                        .sort((a, b) => a.language.localeCompare(b.language))
+                                        .map((translation, index) => (
+                                            <span key={index} className="mr-2">
                                                 {translation.name}
                                                 {index === 0 && " /"}
                                             </span>
@@ -658,11 +661,13 @@ const EditPostPage = () => {
                                         checked={formData.tags.includes(tag.id)}
                                     />
                                     <label htmlFor={tag.id} className="ml-2">
-                                        {tag.translations.map((translation, index) => (
-                                            <span key={index} className="mr-2">
-                                                {translation.name}
-                                                {index === 0 && " /"}
-                                            </span>
+                                        {tag.translations
+                                            .sort((a, b) => a.language.localeCompare(b.language))
+                                            .map((translation, index) => (
+                                                <span key={index} className="mr-2">
+                                                    {translation.name}
+                                                    {index === 0 && " /"}
+                                                </span>
                                         ))}
                                     </label>
                                 </div>

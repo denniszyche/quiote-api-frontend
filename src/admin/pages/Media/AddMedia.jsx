@@ -114,8 +114,8 @@ const AddMediaPage = () => {
                     <FileUpload
                         ref={fileUploadRef} 
                         name="media"
-                        accept="image/*"
-                        maxFileSize={2000000}
+                        accept="image/*, .svg"
+                        maxFileSize={4000000}
                         mode="basic"
                         auto
                         customUpload

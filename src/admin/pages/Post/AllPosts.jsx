@@ -9,12 +9,15 @@ import { Menu } from "primereact/menu";
 import { Toast } from "primereact/toast";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { format } from "date-fns";
+import { InputText } from "primereact/inputtext";
 import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
         
 
 const AllPostsPage = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [globalFilter, setGlobalFilter] = useState("");
+    const [filteredData, setFilteredData] = useState([]); // State for filtered data
     const toast = useRef(null);
     const navigate = useNavigate();
 
@@ -37,7 +40,21 @@ const AllPostsPage = () => {
         }
         fetchData();
     }, []);
-    
+
+    useEffect(() => {
+        if (!globalFilter) {
+            setFilteredData(data);
+        } else {
+            const lowerCaseFilter = globalFilter.toLowerCase();
+            const filtered = data.filter((post) =>
+                post.translations?.some((translation) =>
+                    translation.title.toLowerCase().includes(lowerCaseFilter)
+                )
+            );
+            setFilteredData(filtered);
+        }
+    }, [globalFilter, data]);
+        
     /**
      * Format the date to dd/MM/yyyy
      * @param {*} value
@@ -210,17 +227,32 @@ const AllPostsPage = () => {
 
     return (
         <div className="flex">
+             <Toast ref={toast} />
+             <ConfirmDialog />
             <div className="card width-shadow w-100">
                 <h4>All Posts</h4>
-                <Button
-                    label="Add Post"
-                    icon="pi pi-plus"
-                    className="p-button-success mb-3"
-                    onClick={() => navigate("/add-post")}
-                />
-                <Toast ref={toast} />
-                <ConfirmDialog />
-                <DataTable value={data}>
+                <div className="flex justify-content-between align-items-center mb-3">
+                    <Button
+                        label="Add Post"
+                        icon="pi pi-plus"
+                        className="p-button-success mb-3"
+                        onClick={() => navigate("/add-post")}
+                    />
+                    <span className="p-input-icon-left">
+                        <InputText
+                            type="search"
+                            onInput={(e) => setGlobalFilter(e.target.value)}
+                            placeholder="Search in Post Title"
+                            className="w-full md:w-20rem"
+                        />
+                    </span>
+                </div>
+                <DataTable
+                    value={filteredData}
+                    paginator
+                    rows={10}
+                    rowsPerPageOptions={[5, 10, 20]}
+                >
                     <Column field="id" header="ID" />
                     <Column
                         field="title"
