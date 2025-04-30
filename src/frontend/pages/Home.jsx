@@ -36,13 +36,10 @@ const Home = () => {
     return (
         <>
             <div className="index">
-                <h1>Home</h1>
-                <p>Welcome to the home page!</p>
-
-                <h2>Posts</h2>
+                <h1>quiote frontend</h1>
                 
-                    <ul className="index__posts-list">
-                        {/* Featured Posts */}
+                    {/* <ul className="index__posts-list">
+                        
                         {data
                             .filter((post) => post.status === "published" && post.featured === "1")
                             .map((post) => {
@@ -50,7 +47,7 @@ const Home = () => {
                                 return <FeaturedPost key={post.id} post={post} translation={translation} />;
                             })}
 
-                        {/* Non-Featured Posts */}
+                        
                         {data
                             .filter((post) => post.status === "published" && post.featured !== "1")
                             .map((post) => {
@@ -62,7 +59,7 @@ const Home = () => {
                                     </li>
                                 );
                             })}
-                    </ul>
+                    </ul> */}
                 
             </div>
         </>

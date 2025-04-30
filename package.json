@@ -7,7 +7,7 @@
   "author": "Dennis Zyche",
   "license": "ISC",
   "scripts": {
-    "dev": "vite & sass --watch src/assets/scss:src --style=compressed",
+    "dev": "vite & sass --watch src/assets/scss:public/css --style=compressed",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
