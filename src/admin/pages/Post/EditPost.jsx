@@ -97,8 +97,8 @@ const EditPostPage = () => {
                         })),
                     external_link: response.post.external_link,
                     createdAt: response.post.createdAt,
-                    collaborator: response.post.collaborator,
-                    photographer: response.post.photographer,
+                    collaborator: response.post.collaborator ? response.post.collaborator : [],
+                    photographer: response.post.photographer ? response.post.photographer : [],
                 });
                 response.post.gallery.forEach((image) => {
                     const imageUrl = `https://quiote-api.dztestserver.de/${image.filepath}`;
@@ -407,7 +407,7 @@ const EditPostPage = () => {
                         {/* Collaborators */}
                         <div className="card width-shadow w-100 mb-3">
                             <h4>Collaborators</h4>
-                            {Array.isArray(formData.collaborator) && formData.collaborator.map((collab, index) => (
+                            {formData.collaborator.map((collab, index) => (
                                 <div key={index} className="flex align-items-end gap-3 mb-3">
                                     <div className="flex-grow-1">
                                         <label htmlFor={`collaborator-name-${index}`} className="block mb-2">
@@ -452,7 +452,7 @@ const EditPostPage = () => {
                         {/* Photographers */}
                         <div className="card width-shadow w-100 mb-3">
                             <h4>Photographers</h4>
-                            {Array.isArray(formData.photographer) && formData.photographer.map((photo, index) => (
+                            {formData.photographer.map((photo, index) => (
                                 <div key={index} className="flex align-items-end gap-3 mb-3">
                                     <div className="flex-grow-1">
                                         <label htmlFor={`photographer-name-${index}`} className="block mb-2">
@@ -649,6 +649,7 @@ const EditPostPage = () => {
                                 </div>
                             ))}
                         </div>
+                        {/* Tags */}
                         <div className="card width-shadow w-100 mb-3">
                             <h4>Tags</h4>
                             {tags.map((tag) => (
