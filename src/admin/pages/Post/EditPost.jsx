@@ -43,6 +43,8 @@ const EditPostPage = () => {
         ],
         createdAt: "",
         external_link: "",
+        collaborator: [],
+        photographer: [],
     });
     const [categories, setCategories] = useState([]);
     const [tags, setTags] = useState([]);
@@ -95,7 +97,8 @@ const EditPostPage = () => {
                         })),
                     external_link: response.post.external_link,
                     createdAt: response.post.createdAt,
-
+                    collaborator: response.post.collaborator,
+                    photographer: response.post.photographer,
                 });
                 response.post.gallery.forEach((image) => {
                     const imageUrl = `https://quiote-api.dztestserver.de/${image.filepath}`;
@@ -158,10 +161,6 @@ const EditPostPage = () => {
     }, []);
 
 
-    /**
-     * Handle the media library modal
-     * @param {*} e
-     */
     const handleFeaturedMediaSelect = async (image) => {
         setFormData({
             ...formData,
@@ -170,10 +169,6 @@ const EditPostPage = () => {
         });
     };
 
-    /**
-     * Handle the media library modal for gallery
-     * @param {*} imageIds
-     */
     const handleGalleryMediaSelect = async (imageIds) => {
         try {
             const imageUrls = await Promise.all(
@@ -218,10 +213,6 @@ const EditPostPage = () => {
         });
     }   
 
-    /**
-     * Handle category change
-     * @param {*} e
-     */
     const onCategoryChange = (e) => {
         let _selectedCategories = [...formData.categories || []];
         if (e.checked) {
@@ -232,10 +223,6 @@ const EditPostPage = () => {
         setFormData({ ...formData, categories: _selectedCategories });
     };
     
-    /**
-     * Handle tag change
-     * @param {*} e
-     */
     const onTagChange = (e) => {
         let _selectedTags = [...formData.tags || []];
         if (e.checked)
@@ -245,21 +232,12 @@ const EditPostPage = () => {
         setFormData({ ...formData, tags: _selectedTags });
     }
 
-    /**
-     * Format the date to dd/MM/yyyy
-     * @param {*} value
-     * @returns
-     */
     const formatDate = (value) => {
         if (!value) return "";
         const date = new Date(value);
         return format(date, "dd/MM/yyyy");
     };
 
-    /**
-     * Handle Input change
-     * @param {*} e
-     */
     const handleChange = (e) => {
         const { name, value } = e.target || e;
         setFormData({
@@ -268,22 +246,45 @@ const EditPostPage = () => {
         });
     };
 
-    /**
-     * Handle translation change
-     * @param {*} index
-     * @param {*} field
-     * @param {*} value
-     */
     const handleTranslationChange = (index, field, value) => {
         const updatedTranslations = [...formData.translations];
         updatedTranslations[index][field] = value;
         setFormData({ ...formData, translations: updatedTranslations });
     };
 
-    /**
-     * Handle form submit
-     * @param {*} e
-     */
+    const handleAddCollaborator = () => {
+        setFormData({
+            ...formData,
+            collaborator: [...formData.collaborator, { name: "", link: "" }],
+        });
+    };
+
+    const handleCollaboratorChange = (index, field, value) => {
+        const updatedCollaborators = [...formData.collaborator];
+        updatedCollaborators[index][field] = value;
+        setFormData({ ...formData, collaborator: updatedCollaborators });
+    };
+
+    const handleRemoveCollaborator = (index) => {
+        const updatedCollaborators = formData.collaborator.filter((_, i) => i !== index);
+        setFormData({ ...formData, collaborator: updatedCollaborators });
+    };
+    const handleAddPhotographer = () => {
+        setFormData({
+            ...formData,
+            photographer: [...formData.photographer, { name: "", link: "" }],
+        });
+    }
+    const handlePhotographerChange = (index, field, value) => {
+        const updatedPhotographers = [...formData.photographer];
+        updatedPhotographers[index][field] = value;
+        setFormData({ ...formData, photographer: updatedPhotographers });
+    };
+    const handleRemovePhotographer = (index) => {
+        const updatedPhotographers = formData.photographer.filter((_, i) => i !== index);
+        setFormData({ ...formData, photographer: updatedPhotographers });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Form data:", formData);
@@ -323,6 +324,7 @@ const EditPostPage = () => {
             <form onSubmit={handleSubmit}>
                 <div className="flex flex-column md:flex-row col-12 gap-3">
                     <div className="w-full md:w-8">
+                        {/* Main Content */}
                         <div className="card width-shadow w-100 mb-3">
                             {formData.translations.map((translation, index) => (
                                 <div key={index} className="mb-4">
@@ -361,7 +363,8 @@ const EditPostPage = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className="card width-shadow w-100">
+                        {/* Gallery */}
+                        <div className="card width-shadow w-100 mb-3">
                             <label
                                 htmlFor="gallery"
                                 className="text-secondary font-semibold block mb-3">
@@ -400,6 +403,96 @@ const EditPostPage = () => {
                                     />
                                 </div>
                             )}
+                        </div>
+                        {/* Collaborators */}
+                        <div className="card width-shadow w-100 mb-3">
+                            <h4>Collaborators</h4>
+                            {formData.collaborator.map((collab, index) => (
+                                <div key={index} className="flex align-items-end gap-3 mb-3">
+                                    <div className="flex-grow-1">
+                                        <label htmlFor={`collaborator-name-${index}`} className="block mb-2">
+                                            Name
+                                        </label>
+                                        <InputText
+                                            id={`collaborator-name-${index}`}
+                                            value={collab.name}
+                                            onChange={(e) => handleCollaboratorChange(index, "name", e.target.value)}
+                                            placeholder="Enter collaborator name"
+                                            className="w-full"
+                                        />
+                                    </div>
+                                    <div className="flex-grow-1">
+                                        <label htmlFor={`collaborator-link-${index}`} className="block mb-2">
+                                            Link
+                                        </label>
+                                        <InputText
+                                            id={`collaborator-link-${index}`}
+                                            value={collab.link}
+                                            onChange={(e) => handleCollaboratorChange(index, "link", e.target.value)}
+                                            placeholder="Enter collaborator link"
+                                            className="w-full"
+                                        />
+                                    </div>
+                                    <Button
+                                        icon="pi pi-trash"
+                                        className="p-button-danger p-button-sm mb-1"
+                                        onClick={() => handleRemoveCollaborator(index)}
+                                        type="button"
+                                    />
+                                </div>
+                            ))}
+                            <Button
+                                label="Add Collaborator"
+                                icon="pi pi-plus"
+                                className="p-button-sm"
+                                onClick={handleAddCollaborator}
+                                type="button"
+                            />
+                        </div>
+                        {/* Photographers */}
+                        <div className="card width-shadow w-100 mb-3">
+                            <h4>Photographers</h4>
+                            {formData.photographer.map((photo, index) => (
+                                <div key={index} className="flex align-items-end gap-3 mb-3">
+                                    <div className="flex-grow-1">
+                                        <label htmlFor={`photographer-name-${index}`} className="block mb-2">
+                                            Name
+                                        </label>
+                                        <InputText
+                                            id={`photographer-name-${index}`}
+                                            value={photo.name}
+                                            onChange={(e) => handlePhotographerChange(index, "name", e.target.value)}
+                                            placeholder="Enter photographer name"
+                                            className="w-full"
+                                        />
+                                    </div>
+                                    <div className="flex-grow-1">
+                                        <label htmlFor={`photographer-link-${index}`} className="block mb-2">
+                                            Link
+                                        </label>
+                                        <InputText
+                                            id={`photographer-link-${index}`}
+                                            value={photo.link}
+                                            onChange={(e) => handlePhotographerChange(index, "link", e.target.value)}
+                                            placeholder="Enter photographer link"
+                                            className="w-full"
+                                        />
+                                    </div>
+                                    <Button
+                                        icon="pi pi-trash"
+                                        className="p-button-danger p-button-sm mb-1"
+                                        onClick={() => handleRemovePhotographer(index)}
+                                        type="button"
+                                    />
+                                </div>
+                            ))}
+                            <Button
+                                label="Add Photographer"
+                                icon="pi pi-plus"
+                                className="p-button-sm"
+                                onClick={handleAddPhotographer}
+                                type="button"
+                            />
                         </div>
                     </div>
                     <div className="w-full md:w-4">

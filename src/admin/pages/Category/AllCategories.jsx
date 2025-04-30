@@ -152,7 +152,6 @@ const AllCategories = () => {
                         onClick={() => navigate("/add-category")}
                     />
                     <DataTable value={data}>
-                        <Column field="id" header="ID" />
                         <Column
                             field="name"
                             header="Name (en)"

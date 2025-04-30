@@ -151,7 +151,6 @@ const AllTagsPage = () => {
                         onClick={() => navigate("/add-tag")}
                     />
                     <DataTable value={data}>
-                        <Column field="id" header="ID" />
                         <Column
                             field="name"
                             header="Name (en)"
