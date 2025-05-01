@@ -33,11 +33,13 @@ const ChangePassword = () => {
                     userId: response.userId
                 });
             } catch (error) {
-                console.error("Error loading JSON:", error);
+                const errorMessages = error.errors
+                    ? error.errors.map((err) => err.msg).join(", ")
+                    : error.message;
                 toast.current.show({
                     severity: "error",
                     summary: "Error",
-                    detail: "Invalid or expired token",
+                    detail: errorMessages,
                 });
             }
         }
@@ -78,7 +80,6 @@ const ChangePassword = () => {
             });
             return;
         }
-        console.log(formData);
         try {
             await fetchFromApi("/auth/change-password", {
                 method: "POST",
@@ -137,6 +138,7 @@ const ChangePassword = () => {
                         }}
                         feedback={false} 
                         tabIndex={1} 
+                        toggleMask
                         className="w-full p-calendar p-component p-inputwrapper mb-3"
                     />
                     <label 
@@ -158,6 +160,7 @@ const ChangePassword = () => {
                         }}
                         feedback={false} 
                         tabIndex={1} 
+                        toggleMask
                         className="w-full p-calendar p-component p-inputwrapper mb-3"
                     />
                     <Button type="submit" label="Change Password" icon="pi pi-user" className="w-12rem" />

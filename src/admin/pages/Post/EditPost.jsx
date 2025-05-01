@@ -287,7 +287,6 @@ const EditPostPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form data:", formData);
         try {
             await fetchFromApi(`/post/update-post/${id}`, {
                 method: "PUT",

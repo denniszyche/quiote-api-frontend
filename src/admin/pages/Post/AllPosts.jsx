@@ -275,11 +275,6 @@ const AllPostsPage = () => {
                         body={featuredBodyTemplate}
                         />
                     <Column
-                        field="user"
-                        header="User"
-                        body={(rowData) => `${rowData.user?.first_name || ''} ${rowData.user?.last_name || ''}`}
-                    />
-                    <Column
                         field="status"
                         header="Status"
                         body={statusBodyTemplate}
