@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { LanguageContext } from "../components/LanguageContext";
 import FeaturedPost from "../components/FeaturedPost";
+import IndexHero from "../components/IndexHero";
 import {fetchFromApi}  from "../../utils/fetchFromApi.js";
 
 const Home = () => {
@@ -15,7 +16,6 @@ const Home = () => {
                     method: "GET"
                 });
                 setData(data.posts || []);
-                // Use the data in your component
             } catch (error) {
                 console.error("Error fetching data:", error);
             } finally {
@@ -27,42 +27,38 @@ const Home = () => {
 
     if (loading) {
         return (
-            <div className="loading">
-                <h1>Loading...</h1>
-            </div>
+            <></>
         );
     }
 
     return (
-        <>
-            <div className="index">
-                <h1>quiote frontend</h1>
-                
-                    {/* <ul className="index__posts-list">
-                        
-                        {data
-                            .filter((post) => post.status === "published" && post.featured === "1")
-                            .map((post) => {
-                                const translation = post.translations.find((t) => t.language === language);
-                                return <FeaturedPost key={post.id} post={post} translation={translation} />;
-                            })}
+        <div className="index">
 
-                        
-                        {data
-                            .filter((post) => post.status === "published" && post.featured !== "1")
-                            .map((post) => {
-                                const translation = post.translations.find((t) => t.language === language);
-                                return (
-                                    <li key={post.id} className="index__posts-list-item">
-                                        <h3>{translation?.title || "No title available"}</h3>
-                                        <p>{translation?.content || "No content available"}</p>
-                                    </li>
-                                );
-                            })}
-                    </ul> */}
+            <IndexHero />
+        
+            <ul className="index__posts-list">
                 
-            </div>
-        </>
+                {data
+                    .filter((post) => post.status === "published" && post.featured === "1")
+                    .map((post) => {
+                        const translation = post.translations.find((t) => t.language === language);
+                        return <FeaturedPost key={post.id} post={post} translation={translation} />;
+                    })}
+
+                
+                {data
+                    .filter((post) => post.status === "published" && post.featured !== "1")
+                    .map((post) => {
+                        const translation = post.translations.find((t) => t.language === language);
+                        return (
+                            <li key={post.id} className="index__posts-list-item">
+                                <h3>{translation?.title || "No title available"}</h3>
+                                <p>{translation?.content || "No content available"}</p>
+                            </li>
+                        );
+                    })}
+            </ul> 
+        </div>  
     );
 }
 export default Home;

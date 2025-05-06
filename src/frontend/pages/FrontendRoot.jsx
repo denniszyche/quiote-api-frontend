@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import { Outlet } from 'react-router-dom';
-import { gsap } from "gsap";
-import { ScrollSmoother } from "gsap/ScrollSmoother";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// Register the plugin
-gsap.registerPlugin(ScrollSmoother);
-gsap.registerPlugin(ScrollTrigger);
+import { gsap } from "gsap";
+    
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+// ScrollSmoother requires ScrollTrigger
+import { ScrollSmoother } from "gsap/ScrollSmoother";
+
+gsap.registerPlugin(ScrollTrigger,ScrollSmoother);
+
 
 const FrontendRoot = () => {
 

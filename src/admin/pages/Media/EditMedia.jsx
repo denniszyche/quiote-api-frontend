@@ -4,6 +4,7 @@ import Spinner from "../../components/Spinner";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
+import { InputSwitch } from "primereact/inputswitch";
 import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const EditMediaPage = () => {
@@ -16,6 +17,7 @@ const EditMediaPage = () => {
         size: "",
         user: "",
         mimetype: "",
+        featured: false,
     });
     const toast = useRef(null);
     const [loading, setLoading] = useState(true);
@@ -37,6 +39,7 @@ const EditMediaPage = () => {
                     size: response.media.size,
                     user: response.media.user,
                     mimetype: response.media.mimetype,
+                    featured: response.media.featured == 1 ? true : false,
                 });
                 setLoading(false);
             } catch (error) {
@@ -126,7 +129,7 @@ const EditMediaPage = () => {
                             <h4>Edit Media</h4>
                             <div className="image-preview mb-3">
                                 <img 
-                                    src={formData.filepath ? `http://localhost:3000/${formData.filepath}` : "/images/cms-logo.svg"}
+                                    src={formData.filepath ? `https://quiote-api.dztestserver.de/${formData.filepath}` : "/images/cms-logo.svg"}
                                     alt="Preview" 
                                     style={{ maxWidth: "100%", height: "auto" }} 
                                     />
@@ -199,6 +202,18 @@ const EditMediaPage = () => {
                                 onChange={handleChange}
                                 disabled
                                 className="w-full p-calendar p-component p-inputwrapper mb-3"></InputText>
+
+                            <label htmlFor="featured" className="block mb-3">
+                                Featured
+                            </label>
+                            <div className="mb-3">
+                                <InputSwitch
+                                    id="featured"
+                                    name="featured"
+                                    checked={formData.featured}
+                                    onChange={(e) => setFormData({ ...formData, featured: e.value })}
+                                />
+                            </div>
                             <div className="flex justify-content-end">
                                 <Button type="submit" label="Save" />
                             </div>

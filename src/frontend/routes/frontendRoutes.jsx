@@ -1,6 +1,6 @@
 import { lazy } from "react";
 import { Suspense } from "react";
-import Spinner from "../../admin/components/Spinner";
+import Loader from "../components/Loader";
 import FrontendRoot from "../pages/FrontendRoot";
 const HomePage = lazy(() => import("../pages/Home"));
 
@@ -11,7 +11,7 @@ const frontendRoutes = [
         path: "/",
         element: <FrontendRoot />,
         errorElement: (
-            <Suspense fallback={<Spinner />}>
+            <Suspense fallback={<Loader />}>
                 <p>Error loading page</p>
             </Suspense>
         ),
@@ -19,7 +19,7 @@ const frontendRoutes = [
             {
                 index: true,
                 element: (
-                    <Suspense fallback={<Spinner />}>
+                    <Suspense fallback={<Loader />}>
                         <LanguageProvider>
                             <HomePage />
                         </LanguageProvider>

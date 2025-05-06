@@ -5,6 +5,7 @@ import Spinner from "../../components/Spinner";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
+import { InputSwitch } from "primereact/inputswitch";
 import { FileUpload } from 'primereact/fileupload';
 import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
@@ -14,6 +15,7 @@ const AddMediaPage = () => {
         filename: "",
         caption: "",
         altText: "",
+        featured: false,
     });
     const toast = useRef(null);
     const navigate = useNavigate();
@@ -162,7 +164,17 @@ const AddMediaPage = () => {
                         onChange={handleChange}
                         className="w-full mb-3"
                     />
-
+                    <label htmlFor="featured" className="block mb-3">
+                        Featured
+                    </label>
+                    <div className="mb-3">
+                        <InputSwitch
+                            id="featured"
+                            name="featured"
+                            checked={formData.featured}
+                            onChange={(e) => setFormData({ ...formData, featured: e.value })}
+                        />
+                    </div>
                     <Button type="submit" label="Save" />
                 </div>
             </form>

@@ -10,6 +10,7 @@ import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { format } from "date-fns";
 import { Image } from 'primereact/image';
 import { InputText } from "primereact/inputtext";
+import { Tag } from "primereact/tag";
 import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const AllMediaPage = () => {
@@ -61,6 +62,20 @@ const AllMediaPage = () => {
      */
     const handleEdit = (rowData) => {
         navigate(`/edit-media/${rowData.id}`);
+    };
+
+
+    const featuredBodyTemplate = (rowData) => {
+        if (rowData.featured === 1 || rowData.featured === "1") {
+            return (
+                <Tag
+                    severity="success"
+                    icon="pi pi-check"
+                    rounded
+                />
+            );
+        }
+        return null;
     };
 
     /**
@@ -193,10 +208,11 @@ const AllMediaPage = () => {
                         field="filename"
                         header="Filename"
                     />
-                    <Column
-                        field="altText"
-                        header="Alt Text"
-                    />
+                     <Column 
+                        field="featured" 
+                        header="featured" 
+                        body={featuredBodyTemplate}
+                        />
                     <Column
                         field="updatedAt"
                         header="Updated"

@@ -500,7 +500,6 @@ const AddPostPage = () => {
                                 name="featured"
                                 checked={formData.featured}
                                 onChange={(e) => handleChange({ target: { name: "featured", value: e.value } })}
-                        
                             />
                             <div className="flex justify-content-end">
                                 <Button type="submit" label="Save" />
