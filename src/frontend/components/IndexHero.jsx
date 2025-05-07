@@ -2,18 +2,18 @@ import { useLayoutEffect, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import { fetchFromApi } from "../../utils/fetchFromApi.js";
-import Loader from "../components/Loader";
-
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function App() {
+const IndexHero = ({ onLoaded, allLoaded }) => {
+    
     const [media, setMedia] = useState([]);
     const component = useRef(null);
     const pinSlider = useRef(null);
     const imagesWrapper = useRef(null);
-    const [loading, setLoading] = useState(true);
-    const [firstImageLoaded, setFirstImageLoaded] = useState(false);
+    const title = useRef(null);
+    const [loadedImages, setLoadedImages] = useState(0);
+
 
     useLayoutEffect(() => {
         const fetchData = async () => {
@@ -27,8 +27,6 @@ export default function App() {
                 setMedia(data.media || []);
             } catch (error) {
                 console.error("Error fetching data:", error);
-            } finally {
-                setLoading(false);
             }
         };
         fetchData();
@@ -38,7 +36,8 @@ export default function App() {
         let interval;
 
         const ctx = gsap.context(() => {
-            gsap.to(pinSlider.current, {
+
+            gsap.to(imagesWrapper.current, {
                 scrollTrigger: {
                     trigger: pinSlider.current,
                     start: "top top",
@@ -50,11 +49,10 @@ export default function App() {
                 duration: 1,
             });
 
-
             if (media.length > 0) {
                 const images = imagesWrapper.current.querySelectorAll("img");
                 gsap.set(images, { autoAlpha: 0 });
-                gsap.set(images[0], { autoAlpha: 1 }); // Show the first image initially
+                gsap.set(images[0], { autoAlpha: 1 });
                 let lastIndex = -1;
                 interval = setInterval(() => {
                     let index;
@@ -62,7 +60,7 @@ export default function App() {
                         index = Math.floor(Math.random() * images.length);
                     } while (index === lastIndex);
                     lastIndex = index;
-                    gsap.set(images, { autoAlpha: 0 }); // Instantly hide all images
+                    gsap.set(images, { autoAlpha: 0 });
                     gsap.set(images[index], { autoAlpha: 1 });
                 }, 750);
             }
@@ -72,15 +70,41 @@ export default function App() {
             clearInterval(interval);
             ctx.revert();
         };
-    }, [media, firstImageLoaded]);
+    }, [media]);
 
-    if (loading) {
-        return (<Loader />);
-    }
+    useEffect(() => {
+        if (loadedImages === media.length && media.length > 0) {
+            onLoaded(); // Notify Home that IndexHero is fully loaded
+        }
+    }, [loadedImages, media, onLoaded]);
+
+
+    useEffect(() => {
+        if (allLoaded) {
+            // Trigger animations when everything is loaded
+            gsap.fromTo(
+                title.current,
+                { opacity: 0, y: 50 },
+                { opacity: 1, y: 0, duration: 1, ease: "power2.out" }
+            );
+            gsap.fromTo(
+                imagesWrapper.current,
+                { opacity: 0, scale: 0.8 },
+                { opacity: 1, scale: 1, duration: 1, ease: "power2.out" }
+            );
+        }
+    }, [allLoaded]);
+
 
     return (
         <div className="index__hero" ref={component}>
+
             <div className="index__hero-pin" ref={pinSlider}>
+
+                <h1 className="index__hero-title" ref={title}>
+                    Quiote
+                </h1>
+
                 <div className="index__hero-image-wrapper" ref={imagesWrapper}>
                     {media.length > 0 ? (
                         media.map((item, index) => (
@@ -88,6 +112,7 @@ export default function App() {
                                 key={index}
                                 src={`https://quiote-api.dztestserver.de/${item.filepath}`}
                                 alt={item.altText || "Media Image"}
+                                onLoad={() => setLoadedImages((prev) => prev + 1)}
                             />
                         ))
                     ) : (
@@ -98,3 +123,5 @@ export default function App() {
         </div>
     );
 }
+
+export default IndexHero;

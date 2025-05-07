@@ -9,7 +9,34 @@
         overflow: hidden;
         height: 100vh;
         width: auto;
-        clip-path: inset(35% round 1rem);
+        margin-bottom: 4rem;
+    }
+
+    &__hero-title{
+        position: absolute;
+        top: 2rem;
+        left: 2rem;
+        z-index: 1;
+        font-size: 12rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: -0.04em;
+        opacity: 0;
+    }
+
+    &__description{
+        grid-column: span 8/span 8;
+        grid-column-start: 2;
+        padding: 2rem;
+
+        p{
+            font-size: 3.4rem;
+            font-weight: 400;
+            line-height: 1.2;
+            letter-spacing: -0.03em;
+            margin: 0;
+        }
+
     }
 
     &__hero-image-wrapper{
@@ -17,6 +44,9 @@
         overflow: hidden;
         height: 100%;
         width: 100%;
+        clip-path: inset(35% round 1rem);
+        z-index: 2;
+        opacity: 0;
 
         img{
             position: absolute;
@@ -28,7 +58,6 @@
             height: 100%;
             object-fit: cover;
             object-position: center;
-            z-index: -1;
         }
     }
 

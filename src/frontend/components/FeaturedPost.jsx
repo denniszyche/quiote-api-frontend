@@ -3,7 +3,7 @@ import { LanguageContext } from "../components/LanguageContext";
 
 const FeaturedPost = ({ post, translation }) => {
     const { language } = useContext(LanguageContext);
-    
+        
     const categoryTranslation = post.categories[0]?.translations.find(
         (t) => t.language === language
     ) || null;

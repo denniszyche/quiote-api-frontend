@@ -20,12 +20,11 @@
     z-index: 99999;
     background-color: var(--accent-purple-front);
     clip-path: inset(35% round 1rem);
-    // animation: loaderAnim 0.7s linear infinite alternate forwards;
+    // animation: loaderAnim 100s linear infinite alternate forwards;
 }
 
 @keyframes loaderAnim{
     to {
-        opacity: 1;
-        transform: scale3d(0.5,0.5,1);
+        clip-path: inset(100% round 1rem);
     }
 }

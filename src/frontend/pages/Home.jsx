@@ -1,63 +1,36 @@
-import { useContext, useEffect, useState } from "react";
-import { LanguageContext } from "../components/LanguageContext";
-import FeaturedPost from "../components/FeaturedPost";
+import { useState, useEffect } from "react";
 import IndexHero from "../components/IndexHero";
-import {fetchFromApi}  from "../../utils/fetchFromApi.js";
+import IndexDescription from "../components/IndexDescription";
+import IndexList from "../components/IndexList";
+import Loader from "../components/Loader";
 
 const Home = () => {
-    const { language } = useContext(LanguageContext);
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [isIndexHeroLoaded, setIndexHeroLoaded] = useState(false);
+    const [isIndexListLoaded, setIndexListLoaded] = useState(false);
+    const [isIndexDescription, setIndexDescription] = useState(false);
+    const [allLoaded, setAllLoaded] = useState(false);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await fetchFromApi("/post/all-posts-frontend", {
-                    method: "GET"
-                });
-                setData(data.posts || []);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
-
-    if (loading) {
-        return (
-            <></>
-        );
-    }
+        if (isIndexHeroLoaded && isIndexListLoaded && isIndexDescription) {
+            setAllLoaded(true);
+        }
+    }, [isIndexHeroLoaded, isIndexDescription, isIndexListLoaded]);
 
     return (
         <div className="index">
-
-            <IndexHero />
-        
-            <ul className="index__posts-list">
-                
-                {data
-                    .filter((post) => post.status === "published" && post.featured === "1")
-                    .map((post) => {
-                        const translation = post.translations.find((t) => t.language === language);
-                        return <FeaturedPost key={post.id} post={post} translation={translation} />;
-                    })}
-
-                
-                {data
-                    .filter((post) => post.status === "published" && post.featured !== "1")
-                    .map((post) => {
-                        const translation = post.translations.find((t) => t.language === language);
-                        return (
-                            <li key={post.id} className="index__posts-list-item">
-                                <h3>{translation?.title || "No title available"}</h3>
-                                <p>{translation?.content || "No content available"}</p>
-                            </li>
-                        );
-                    })}
-            </ul> 
+            {!isIndexHeroLoaded && !isIndexListLoaded && (
+                <Loader />
+            )}
+            <IndexHero 
+                onLoaded={() => setIndexHeroLoaded(true)} 
+                allLoaded={allLoaded}
+            />
+            <IndexDescription
+                onLoaded={() => setIndexDescription(true)} 
+            />
+            <IndexList 
+                onLoaded={() => setIndexListLoaded(true)} 
+            />
         </div>  
     );
 }
