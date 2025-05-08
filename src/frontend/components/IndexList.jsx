@@ -52,18 +52,9 @@ const IndexList = ({ onLoaded }) => {
                     return <FeaturedPost key={post.id} post={post} translation={translation} />;
                 })}
                 
-            {data.map((post) => renderPost(post))}
-            {/* {data
+            {data
                 .filter((post) => post.status === "published" && post.featured !== "1")
-                .map((post) => {
-                    const translation = post.translations.find((t) => t.language === language);
-                    return (
-                        <li key={post.id} className="index__posts-list-item">
-                            <h3>{translation?.title || "No title available"}</h3>
-                            <p>{translation?.content || "No content available"}</p>
-                        </li>
-                    );
-                })} */}
+                .map((post) => renderPost(post))}
         </ul> 
     );
 
