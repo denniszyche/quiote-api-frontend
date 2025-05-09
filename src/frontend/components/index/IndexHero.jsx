@@ -2,7 +2,7 @@ import { useLayoutEffect, useEffect, useRef, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import { fetchFromApi } from "../../utils/fetchFromApi.js";
+import { fetchFromApi } from "../../../utils/fetchFromApi.js";
 
 gsap.registerPlugin(ScrollTrigger);
 

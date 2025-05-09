@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import { LanguageContext } from "../components/LanguageContext";
-import Image from "../components/Image";
+import { LanguageContext } from "../../components/LanguageContext";
+import Image from "../../components/Image";
 
-const ViewComponent = ({ post, translation }) => {
+const PlainComponent = ({ post, translation }) => {
     const { language } = useContext(LanguageContext);
     
     const featuredImage = post.featuredImage ? post.featuredImage.filepath : null;
@@ -15,10 +15,10 @@ const ViewComponent = ({ post, translation }) => {
         if (!text) return "";
         return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
     };
-
+    
     return (
         <li key={post.id} className="index__posts-list-item">
-            <a href={`/post/${post.id}`} className={`index__posts-list-item--link ${hasNoThumbnail}`}>
+            <div className={`index__posts-list-item--plain ${hasNoThumbnail}`} target="_blank" rel="noopener noreferrer">
                 <div className="index__posts-list-item---header">
                     <div className="index__posts-list-item--category">
                         <span className="circle"></span>
@@ -44,9 +44,9 @@ const ViewComponent = ({ post, translation }) => {
                         />
                     </div>
                 )}
-            </a>
+            </div>
         </li>
     );
 }
 
-export default ViewComponent;
+export default PlainComponent;

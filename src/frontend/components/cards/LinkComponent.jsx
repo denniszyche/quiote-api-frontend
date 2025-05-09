@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import { LanguageContext } from "../components/LanguageContext";
-import Image from "../components/Image";
+import { LanguageContext } from "../../components/LanguageContext";
+import Image from "../../components/Image";
 
-const PlainComponent = ({ post, translation }) => {
+const LinkComponent = ({ post, translation }) => {
     const { language } = useContext(LanguageContext);
     
     const featuredImage = post.featuredImage ? post.featuredImage.filepath : null;
@@ -18,7 +18,7 @@ const PlainComponent = ({ post, translation }) => {
     
     return (
         <li key={post.id} className="index__posts-list-item">
-            <div className={`index__posts-list-item--plain ${hasNoThumbnail}`} target="_blank" rel="noopener noreferrer">
+            <a href={post.external_link} className={`index__posts-list-item--link ${hasNoThumbnail}`} target="_blank" rel="noopener noreferrer">
                 <div className="index__posts-list-item---header">
                     <div className="index__posts-list-item--category">
                         <span className="circle"></span>
@@ -44,9 +44,9 @@ const PlainComponent = ({ post, translation }) => {
                         />
                     </div>
                 )}
-            </div>
+            </a>
         </li>
     );
 }
 
-export default PlainComponent;
+export default LinkComponent;

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { LanguageContext } from "../components/LanguageContext";
-import {fetchFromApi}  from "../../utils/fetchFromApi.js";
+import { LanguageContext } from "../../components/LanguageContext";
+import {fetchFromApi}  from "../../../utils/fetchFromApi.js";
 
 const IndexDescription = ({ onLoaded }) => {
     const { language } = useContext(LanguageContext);

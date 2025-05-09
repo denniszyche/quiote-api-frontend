@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import { LanguageContext } from "../components/LanguageContext";
-import Image from "../components/Image";
+import { LanguageContext } from "../../components/LanguageContext";
+import Image from "../../components/Image";
 
-const FeaturedPost = ({ post, translation }) => {
+const FeaturedComponent = ({ post, translation }) => {
     const { language } = useContext(LanguageContext);
     
     const featuredImage = post.featuredImage ? post.featuredImage.filepath : null;        
@@ -49,4 +49,4 @@ const FeaturedPost = ({ post, translation }) => {
     );
 };
 
-export default FeaturedPost;
+export default FeaturedComponent;

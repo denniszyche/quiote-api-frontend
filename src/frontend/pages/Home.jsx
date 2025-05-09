@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import Nav from "../components/Nav";
-import IndexHero from "../components/IndexHero";
-import IndexDescription from "../components/IndexDescription";
-import IndexList from "../components/IndexList";
+import IndexHero from "../components/index/IndexHero";
+import IndexDescription from "../components/index/IndexDescription";
+import IndexList from "../components/index/IndexList";
 import Loader from "../components/Loader";
 
 const Home = () => {
