@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Nav from "../components/Nav";
 import IndexHero from "../components/IndexHero";
 import IndexDescription from "../components/IndexDescription";
 import IndexList from "../components/IndexList";
@@ -12,15 +13,16 @@ const Home = () => {
 
     useEffect(() => {
         if (isIndexHeroLoaded && isIndexListLoaded && isIndexDescription) {
+            console.log("All components are loaded");
             setAllLoaded(true);
         }
     }, [isIndexHeroLoaded, isIndexDescription, isIndexListLoaded]);
 
     return (
         <div className="index">
-            {!isIndexHeroLoaded && !isIndexListLoaded && (
+            {!isIndexHeroLoaded || !isIndexListLoaded || !isIndexDescription ? (
                 <Loader />
-            )}
+            ) : null}
             <IndexHero 
                 onLoaded={() => setIndexHeroLoaded(true)} 
                 allLoaded={allLoaded}

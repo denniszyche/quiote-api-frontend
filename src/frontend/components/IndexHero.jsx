@@ -1,4 +1,5 @@
 import { useLayoutEffect, useEffect, useRef, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import { fetchFromApi } from "../../utils/fetchFromApi.js";
@@ -6,14 +7,13 @@ import { fetchFromApi } from "../../utils/fetchFromApi.js";
 gsap.registerPlugin(ScrollTrigger);
 
 const IndexHero = ({ onLoaded, allLoaded }) => {
-    
+    const { navRef } = useOutletContext();
     const [media, setMedia] = useState([]);
     const component = useRef(null);
     const pinSlider = useRef(null);
     const imagesWrapper = useRef(null);
     const title = useRef(null);
     const [loadedImages, setLoadedImages] = useState(0);
-
 
     useLayoutEffect(() => {
         const fetchData = async () => {
@@ -44,6 +44,21 @@ const IndexHero = ({ onLoaded, allLoaded }) => {
                     end: "+=2000",
                     pin: true,
                     scrub: 1,
+                    onLeave: () => {
+                        gsap.to(navRef.current, {
+                            yPercent: 0,
+                            duration: 0.5,
+                            ease: "power2.out",
+                        });
+                    },
+                    onEnterBack: () => {
+                        gsap.to(navRef.current, {
+                            yPercent: -100,
+                            duration: 0.5,
+                            ease: "power2.out",
+                        });
+                            
+                    },
                 },
                 clipPath: "inset(0% round 1rem)",
                 duration: 1,
@@ -70,11 +85,12 @@ const IndexHero = ({ onLoaded, allLoaded }) => {
             clearInterval(interval);
             ctx.revert();
         };
-    }, [media]);
+    }, [media, navRef]);
 
     useEffect(() => {
         if (loadedImages === media.length && media.length > 0) {
-            onLoaded(); // Notify Home that IndexHero is fully loaded
+            onLoaded();
+            console.log("All images loaded");
         }
     }, [loadedImages, media, onLoaded]);
 

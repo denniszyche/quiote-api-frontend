@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Outlet } from 'react-router-dom';
 
 import { gsap } from "gsap";
@@ -8,8 +8,11 @@ import { ScrollSmoother } from "gsap/ScrollSmoother";
 
 gsap.registerPlugin(ScrollTrigger,ScrollSmoother);
 
+import Nav from "../components/Nav";
+
 
 const FrontendRoot = () => {
+    const navRef = useRef(null);
 
     useEffect(() => {
         const smoother = ScrollSmoother.create({
@@ -36,11 +39,14 @@ const FrontendRoot = () => {
     }, []);
 
     return (
-        <div className="page-content">
-            <main className="page-content__main">
-                <Outlet />
-            </main>
-        </div>
+        <>
+        <Nav ref={navRef} />
+            <div className="page-content">
+                <main className="page-content__main">
+                    <Outlet context={{ navRef }} />
+                </main>
+            </div>
+        </>
     );
 }
 export default FrontendRoot;

@@ -14,11 +14,12 @@ const IndexDescription = ({ onLoaded }) => {
                 });
                 const infoSetting = data.settings.find(setting => setting.key === "info");
                 if (infoSetting) {
-                    setDescription(infoSetting.value[language]);
+                    setDescription(infoSetting.value);
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
             } finally {
+                console.log("IndexDescription successfully:");
                 onLoaded();
             }
         };
@@ -28,7 +29,7 @@ const IndexDescription = ({ onLoaded }) => {
     return (
         <div className="grid">
             <div className="index__description">
-                <p>{description}</p>
+                <p>{description[language]}</p>
             </div>
         </div>
     )
