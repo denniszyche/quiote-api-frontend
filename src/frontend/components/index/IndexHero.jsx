@@ -24,6 +24,7 @@ const IndexHero = ({ onLoaded, allLoaded }) => {
                         method: "GET",
                     }
                 );
+                console.log("Fetched media data:", data);
                 setMedia(data.media || []);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -123,17 +124,35 @@ const IndexHero = ({ onLoaded, allLoaded }) => {
 
                 <div className="index__hero-image-wrapper" ref={imagesWrapper}>
                     {media.length > 0 ? (
-                        media.map((item, index) => (
-                            <img
+                        media.map((item, index) => {
+                            const baseUrl = "https://quiote-api.dztestserver.de/";
+                            const original = item.filepath;
+                            const match = original.match(/\.(jpe?g)$/i);
+                            const ext = match ? match[0] : ".jpg";
+                            const baseName = original.replace(/\.(jpe?g)$/i, "");
+                            const small = `${baseName}-480w${ext}`;
+                            const medium = `${baseName}-800w${ext}`;
+                            const large = `${baseName}-1200w${ext}`;
+                            const srcSet = `${baseUrl}${small} 480w, ${baseUrl}${medium} 800w, ${baseUrl}${large} 1200w`;
+                            return (
+                            <picture
                                 key={index}
-                                src={`https://quiote-api.dztestserver.de/${item.filepath}`}
                                 alt={item.altText || "Media Image"}
+                                className="index__hero-image"
                                 onLoad={() => setLoadedImages((prev) => prev + 1)}
-                            />
-                        ))
-                    ) : (
-                        <></>
-                    )}
+                            >
+                                <source
+                                    media="(max-width: 900px)"
+                                    srcSet={`${baseUrl}${large}`}
+                                />
+                                <img
+                                    src={`${baseUrl}${item.filepath}`}
+                                    alt="Media Image"
+                                />
+                                </picture>
+                            );
+                        })
+                    ) : null}
                 </div>
             </div>
         </div>

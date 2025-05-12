@@ -44,7 +44,7 @@
         position: relative;
         overflow: hidden;
         height: 100%;
-        width: 100%;
+        max-width: 100%;
         clip-path: inset(35% round 1rem);
         z-index: 2;
         opacity: 0;

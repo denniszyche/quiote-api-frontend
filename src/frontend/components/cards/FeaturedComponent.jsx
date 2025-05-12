@@ -1,11 +1,13 @@
 import { useContext } from "react";
 import { LanguageContext } from "../../components/LanguageContext";
 import Image from "../../components/Image";
+import { getResponsiveImageSources } from "../../../utils/getResponsiveImageSources.js";
 
 const FeaturedComponent = ({ post, translation }) => {
     const { language } = useContext(LanguageContext);
     
-    const featuredImage = post.featuredImage ? post.featuredImage.filepath : null;        
+    const featuredImage = post.featuredImage ? post.featuredImage.filepath : null;
+    const imageProps = featuredImage ? getResponsiveImageSources(featuredImage) : {};       
     const categoryTranslation = post.categories[0]?.translations.find(
         (t) => t.language === language
     ) || null;
@@ -35,7 +37,7 @@ const FeaturedComponent = ({ post, translation }) => {
                 <div className="index__posts-list-item--featured-image">
                     {featuredImage && (
                         <Image
-                            src={`https://quiote-api.dztestserver.de/${featuredImage}`}
+                            {...imageProps}
                             alt={translation?.title || ""}
                             className="index__posts-list-item--featured-image-src"
                         />

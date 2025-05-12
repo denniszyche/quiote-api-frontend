@@ -75,6 +75,7 @@ const AddMediaPage = () => {
             formDataToSend.append("media", formData.media);
             formDataToSend.append("caption", formData.caption);
             formDataToSend.append("altText", formData.altText);
+            formDataToSend.append("featured", formData.featured);
             formDataToSend.append("filename", formData.filename);
             await fetchFromApi("/media/create-media", {
                 method: "POST",

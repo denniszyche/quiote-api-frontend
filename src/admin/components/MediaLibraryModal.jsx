@@ -91,20 +91,29 @@ const MediaLibraryModal = ({ visible, onHide, onSelect, selectedMedia = [] }) =>
                         <Column selectionMode="multiple" headerStyle={{ width: "3em" }} />
                         <Column
                             header="Thumbnail"
-                            body={(rowData) => (
-                                <Image
-                                    src={rowData.filepath ? `https://quiote-api.dztestserver.de/${rowData.filepath}` : "/images/cms-logo.svg"}
-                                    zoomSrc={rowData.filepath ? `https://quiote-api.dztestserver.de/${rowData.filepath}` : "/images/cms-logo.svg"}
-                                    alt={rowData.altText || "Media Thumbnail"}
-                                    width="80"
-                                    height="80"
-                                    preview
-                                    style={{
-                                        objectFit: "cover",
-                                        backgroundColor: "#f0f0f0",
-                                    }}
-                                />
-                            )}
+                            body={(rowData) => {
+                                let thumbSrc = "/images/cms-logo.svg";
+                                if (rowData.filepath) {
+                                    const match = rowData.filepath.match(/\.(jpe?g)$/i);
+                                    const ext = match ? match[0] : ".jpg";
+                                    const baseName = rowData.filepath.replace(/\.(jpe?g)$/i, "");
+                                    thumbSrc = `https://quiote-api.dztestserver.de/${baseName}-480w${ext}`;
+                                }
+                                return (
+                                    <Image
+                                        src={thumbSrc}
+                                        zoomSrc={rowData.filepath ? `https://quiote-api.dztestserver.de/${rowData.filepath}` : "/images/cms-logo.svg"}
+                                        alt={rowData.altText || "Media Thumbnail"}
+                                        width="80"
+                                        height="80"
+                                        preview
+                                        style={{
+                                            objectFit: "cover",
+                                            backgroundColor: "#f0f0f0",
+                                        }}
+                                    />
+                                );
+                            }}
                         />
                         <Column field="filename" header="Filename" />
                         <Column field="altText" header="Alt Text" />

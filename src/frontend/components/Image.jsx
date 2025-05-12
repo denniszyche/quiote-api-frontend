@@ -1,22 +1,27 @@
 import { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
 
-const Image = ({ src, alt, className, fallbackClassName }) => {
-    const [loaded, setLoaded] = useState(false); // Track if the image is loaded
-    const [error, setError] = useState(false); // Track if the image failed to load
-    const imgRef = useRef(null); // Reference to the image element
-    const fallbackRef = useRef(null); // Reference to the fallback element
+const Image = ({
+    src,
+    alt,
+    className,
+    fallbackClassName,
+    srcSet,
+    sizes,
+}) => {
+    const [loaded, setLoaded] = useState(false);
+    const [error, setError] = useState(false);
+    const imgRef = useRef(null);
+    const fallbackRef = useRef(null);
 
     useEffect(() => {
         if (loaded && !error) {
-            // Fade in the image using GSAP when it's loaded
             gsap.to(imgRef.current, {
                 opacity: 1,
                 duration: 0.5,
                 ease: "power2.out",
             });
         } else if (error) {
-            // Fade in the fallback element if the image fails to load
             gsap.to(fallbackRef.current, {
                 opacity: 1,
                 duration: 0.5,
@@ -43,6 +48,8 @@ const Image = ({ src, alt, className, fallbackClassName }) => {
         <img
             ref={imgRef}
             src={src}
+            srcSet={srcSet}
+            sizes={sizes}
             alt={alt}
             className={className}
             style={{ opacity: 0 }}
