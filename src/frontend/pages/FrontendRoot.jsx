@@ -10,7 +10,6 @@ gsap.registerPlugin(ScrollTrigger,ScrollSmoother);
 
 import Nav from "../components/Nav";
 
-
 const FrontendRoot = () => {
     const navRef = useRef(null);
 
@@ -20,6 +19,9 @@ const FrontendRoot = () => {
             content: ".page-content__main", // The content element
             smooth: 1.2, // Smoothness (higher is smoother)
             effects: true, // Enable effects like parallax
+            normalizeScroll: true, // Normalize scroll for smoother experience
+            ignoreMobileResize: true, // Ignore mobile resize
+            
         });
 
         // Cleanup on unmount

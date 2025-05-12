@@ -13,6 +13,7 @@ const IndexHero = ({ onLoaded, allLoaded }) => {
     const pinSlider = useRef(null);
     const imagesWrapper = useRef(null);
     const title = useRef(null);
+    const description = useRef(null);
     const [loadedImages, setLoadedImages] = useState(0);
 
     useLayoutEffect(() => {
@@ -105,6 +106,11 @@ const IndexHero = ({ onLoaded, allLoaded }) => {
                 { opacity: 1, y: 0, duration: 1, ease: "power2.out" }
             );
             gsap.fromTo(
+                description.current,
+                { opacity: 0, y: 50 },
+                { opacity: 1, y: 0, duration: 1, ease: "power2.out" }
+            );
+            gsap.fromTo(
                 imagesWrapper.current,
                 { opacity: 0, scale: 0.8 },
                 { opacity: 1, scale: 1, duration: 1, ease: "power2.out" }
@@ -119,7 +125,7 @@ const IndexHero = ({ onLoaded, allLoaded }) => {
             <div className="index__hero-pin" ref={pinSlider}>
 
                 <h1 className="index__hero-title" ref={title}>
-                    Quiote
+                    {/* Q */}
                 </h1>
 
                 <div className="index__hero-image-wrapper" ref={imagesWrapper}>
@@ -154,6 +160,10 @@ const IndexHero = ({ onLoaded, allLoaded }) => {
                         })
                     ) : null}
                 </div>
+
+                <p className="index__hero-description" ref={description}>
+                    QUIOTE is a socio-spatial design agency crafting utopian futures from within the contested terrains of the Global South.
+                </p>
             </div>
         </div>
     );

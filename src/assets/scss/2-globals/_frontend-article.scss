@@ -16,10 +16,10 @@ h1, h2, h3, h4, h5, h6{
 }
 
 .circle{
-    width: 1.2rem;
-    height: 1.2rem;
+    width: 22px;
+    height: 12px;
     background-color: var(--color-black);
-    border-radius: 1rem;
+    border-radius: 3px;
     flex-shrink: 0;
     display: inline-block;
 }
