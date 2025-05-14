@@ -25,7 +25,6 @@ const IndexHero = ({ onLoaded, allLoaded }) => {
                         method: "GET",
                     }
                 );
-                console.log("Fetched media data:", data);
                 setMedia(data.media || []);
             } catch (error) {
                 console.error("Error fetching data:", error);

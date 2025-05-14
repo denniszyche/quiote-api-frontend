@@ -21,7 +21,7 @@ const PlainComponent = ({ post, translation }) => {
             <div className={`index__posts-list-item--plain ${hasNoThumbnail}`} target="_blank" rel="noopener noreferrer">
                 <div className="index__posts-list-item---header">
                     <div className="index__posts-list-item--category">
-                        <span className="circle"></span>
+                        <span className="circle" aria-hidden="true"></span>
                         <span>{categoryTranslation?.name || ""}</span>
                     </div>
                 </div>

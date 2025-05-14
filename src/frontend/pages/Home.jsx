@@ -3,6 +3,7 @@ import IndexHero from "../components/index/IndexHero";
 import IndexDescription from "../components/index/IndexDescription";
 import IndexList from "../components/index/IndexList";
 import Loader from "../components/Loader";
+import Footer from "../components/Footer";
 
 const Home = () => {
     const [isIndexHeroLoaded, setIndexHeroLoaded] = useState(false);
@@ -18,21 +19,24 @@ const Home = () => {
     }, [isIndexHeroLoaded, isIndexDescription, isIndexListLoaded]);
 
     return (
-        <div className="index">
-            {!isIndexHeroLoaded || !isIndexListLoaded || !isIndexDescription ? (
-                <Loader />
-            ) : null}
-            <IndexHero 
-                onLoaded={() => setIndexHeroLoaded(true)} 
-                allLoaded={allLoaded}
-            />
-            <IndexDescription
-                onLoaded={() => setIndexDescription(true)} 
-            />
-            <IndexList 
-                onLoaded={() => setIndexListLoaded(true)} 
-            />
-        </div>  
+        <>
+            <div className="index">
+                {!isIndexHeroLoaded || !isIndexListLoaded || !isIndexDescription ? (
+                    <Loader />
+                ) : null}
+                <IndexHero 
+                    onLoaded={() => setIndexHeroLoaded(true)} 
+                    allLoaded={allLoaded}
+                />
+                <IndexDescription
+                    onLoaded={() => setIndexDescription(true)} 
+                />
+                <IndexList 
+                    onLoaded={() => setIndexListLoaded(true)} 
+                />
+            </div>
+            <Footer />  
+        </>
     );
 }
 export default Home;

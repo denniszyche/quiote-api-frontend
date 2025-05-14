@@ -21,7 +21,7 @@ const ViewComponent = ({ post, translation }) => {
             <a href={`/post/${post.id}`} className={`index__posts-list-item--link ${hasNoThumbnail}`}>
                 <div className="index__posts-list-item---header">
                     <div className="index__posts-list-item--category">
-                        <span className="circle"></span>
+                        <span className="circle" aria-hidden="true"></span>
                         <span>{categoryTranslation?.name || ""}</span>
                     </div>
                 </div>

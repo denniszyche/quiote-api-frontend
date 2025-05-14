@@ -1,0 +1,85 @@
+.footer{
+    position: relative;
+    padding-top: 100px;
+    padding-bottom: 50px;
+
+    &__content{
+        position: relative;
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+        padding: 0 15px;
+    }
+
+    &__content-claim{
+        grid-column: span 2/span 2;
+        padding: 20px;
+
+        h3{
+            font-size: 24px;
+            font-weight: 400;
+
+            span{
+                margin-right: 5px;
+                transform: translateY(-2px);
+            }
+        }
+    }
+
+    &__content-contact{
+        position: relative;
+        background-color: var(--accent-purple-front);
+        border-radius: 1rem;
+        display: flex;
+        align-items: flex-end;
+        overflow: hidden;
+        padding: 20px;
+
+        dl{
+            margin: 0;
+            
+            dd{
+                font-size: 20px;
+                font-weight: 400;
+                padding: 0;
+                margin: 0;
+                color: var(--accent-yellow);
+
+                a {
+                    position: relative;
+                    display: inline-block;
+                    text-decoration: none;
+                    color: var(--accent-yellow);
+                    font-size: 20px;
+
+                    &:after{
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        bottom: -2px;
+                        width: 100%;
+                        height: 2px;
+                        background-color: var(--color-black);
+                        transform: scaleX(0);
+                        transition: transform 0.3s ease-in-out;
+                    }
+
+                    &:hover, 
+                    &:focus-visible {
+
+                        &:after{
+                            transform: scaleX(1);
+                        }
+                    }
+                    &.mailaddress{
+                        word-break: break-all;
+                        overflow-wrap: anywhere;
+                        white-space: normal;
+                    }
+                }
+            }
+        }
+            
+    }
+}

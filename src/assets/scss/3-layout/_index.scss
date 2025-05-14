@@ -101,6 +101,7 @@
         grid-template-columns: repeat(1,minmax(0,1fr));
         gap: 50px;
         padding: 15px;
+        margin-bottom: 50px;
         
         @media (min-width: 768px) {
             padding: 20px;
@@ -149,7 +150,7 @@
                 background-color: var(--accent-purple-front);
 
                 .index__posts-list-item--title h3{
-                    color: var(--accent-yellow)
+                    color: var(--accent-yellow);
                 }
             }
         }

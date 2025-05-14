@@ -56,11 +56,11 @@ const IndexList = ({ onLoaded }) => {
     const getTranslation = (key) => {
         const translations = {
             en: {
-                allCategories: "All Categories",
+                allCategories: "All Projects",
                 toggleMenu: "Toggle Category Menu",
             },
             es: {
-                allCategories: "Todas las Categorías",
+                allCategories: "Todos los Proyectos",
                 toggleMenu: "Alternar Menú de Categorías",
             },
         };

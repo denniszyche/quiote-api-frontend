@@ -24,7 +24,7 @@ const FeaturedComponent = ({ post, translation }) => {
 
                 <div className="index__posts-list-item--featured-header">
                     <div className="index__posts-list-item--featured-category">
-                        <span className="circle"></span>
+                        <span className="circle" aria-hidden="true"></span>
                         <span>{categoryTranslation?.name || ""}</span>
                     </div>
                     <div className="index__posts-list-item--featured-title">

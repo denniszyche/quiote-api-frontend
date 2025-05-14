@@ -21,7 +21,7 @@ const LinkComponent = ({ post, translation }) => {
             <a href={post.external_link} className={`index__posts-list-item--link ${hasNoThumbnail}`} target="_blank" rel="noopener noreferrer">
                 <div className="index__posts-list-item---header">
                     <div className="index__posts-list-item--category">
-                        <span className="circle"></span>
+                        <span className="circle" aria-hidden="true"></span>
                         <span>{categoryTranslation?.name || ""}</span>
                     </div>
                 </div>
